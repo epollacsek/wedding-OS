@@ -140,8 +140,8 @@ supabase/
 ## Architecture & Design Principles
 
 ### UI patterns
-- **Top-tab navigation** for macro modules (Home, Attendance, Vendors, Finance, Website, More) — never a sidebar
-- **Sub-tabs** within each module for its microservices
+- **Left sidebar navigation** (Deel pattern) for macro modules — see `DESIGN.md` for exact specs
+- **Deel "People" table pattern** for all data lists: header stats row → filter bar → table with row actions. Use shadcn `Table` as the base.
 - **Deel "People" table pattern** for all data lists: header stats row → filter bar → table with row actions. Use shadcn `Table` as the base.
 - **shadcn `Dialog`** for all modals. Multi-step flows use a stepped modal with a progress indicator — not separate pages.
 - **Inline progressive disclosure** for optional fields (e.g. "+ Add plus one" expands inline)
@@ -152,7 +152,6 @@ supabase/
 - Guest contact info (phone, address) never appears in URLs, page titles, or open graph tags
 
 ### Forbidden patterns
-- No sidebar navigation
 - No raw HTML when a shadcn component exists
 - No `select('*')` on tables with sensitive data — always name the columns you need
 - No client-side data fetching for initial page load — use Server Components

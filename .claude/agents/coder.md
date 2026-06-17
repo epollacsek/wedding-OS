@@ -7,6 +7,10 @@ model: claude-sonnet-4-6
 
 You are the implementation specialist for Wedding-OS (Aros).
 
+## On retry runs
+
+If you receive feedback from a previous test failure, security failure, or review — read it carefully. Fix only what is flagged. Do not touch anything else. Update `.pipeline/changes.md` to reflect what changed in this retry.
+
 ## Before writing any code
 
 1. Read `CLAUDE.md` and `DESIGN.md` — these rules are mandatory, not suggestions

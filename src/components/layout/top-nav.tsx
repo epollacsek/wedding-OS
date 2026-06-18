@@ -41,11 +41,11 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
               collapsed ? 'left-[78px]' : 'left-[300px]'
             )}
           >
-            <div className="absolute left-1/2 flex h-[52px] w-[min(846px,calc(90%_-_48px))] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-5 shadow-[0_10px_32px_rgba(27,27,27,0.18)] origin-center animate-in fade-in zoom-in-50 duration-500">
+            <div className="absolute left-1/2 flex h-11 w-[min(560px,calc(100%_-_48px))] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 shadow-[0_10px_32px_rgba(27,27,27,0.18)] origin-center animate-in fade-in zoom-in-50 duration-500 xl:h-[52px] xl:w-[min(846px,calc(90%_-_48px))] xl:px-5">
               <Search className="size-[22px] shrink-0 text-[#1B1B1B]/70" />
               <input
                 ref={searchInputRef}
-                className="min-w-0 flex-1 bg-transparent text-[19px] font-normal text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/65"
+                className="min-w-0 flex-1 bg-transparent text-base font-normal text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/65 xl:text-[19px]"
                 placeholder="Search guests, vendors, pages or ask Aroos AI"
                 type="search"
               />
@@ -76,13 +76,13 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
 
       <div
         className={cn(
-          'pointer-events-none absolute right-0 top-1/2 z-10 flex -translate-y-1/2 justify-center',
+          'pointer-events-none absolute right-0 top-1/2 z-10 flex -translate-y-1/2 justify-start pl-4 min-[1500px]:justify-center min-[1500px]:pl-0',
           collapsed ? 'left-[78px]' : 'left-[300px]'
         )}
       >
         <button
           type="button"
-          className="pointer-events-auto h-12 w-[min(713px,calc(90%_-_48px))] flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
+          className="pointer-events-auto h-12 w-[min(430px,calc(100%_-_260px))] min-w-44 flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover min-[1500px]:w-[min(713px,calc(90%_-_48px))]"
           aria-expanded={searchOpen}
           onClick={() => setSearchOpen(true)}
           onPointerDown={() => setSearchOpen(true)}

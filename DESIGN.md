@@ -25,7 +25,7 @@ Never hardcode hex values in components — always use the token classes.
 ## Typography
 
 Inter (loaded via `next/font/google` in `src/app/layout.tsx`). Never CDN, never system-ui.  
-Base: `14px / 400`. Page titles: `37px / 700` (Bagoss with Inter fallback).  
+Base: `14px / 400`. Page titles: `43px / 700` (Bagoss with Inter fallback).  
 The exact sizes for each context are visible in the reference components below.
 
 ---

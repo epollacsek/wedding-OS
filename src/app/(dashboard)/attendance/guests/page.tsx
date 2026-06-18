@@ -12,7 +12,7 @@ export default function GuestsPage() {
           Guest Directory
         </span>
       </nav>
-      <h1 className="mt-4 text-[37px] font-bold leading-10 text-[#1B1B1B]">Guest Directory</h1>
+      <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Guest Directory</h1>
     </div>
   )
 }

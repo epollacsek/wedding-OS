@@ -12,7 +12,7 @@ export default function TransportationPage() {
           Transportation
         </span>
       </nav>
-      <h1 className="mt-4 text-[32px] font-bold leading-10 text-[#1B1B1B]">Transportation</h1>
+      <h1 className="mt-4 text-[37px] font-bold leading-10 text-[#1B1B1B]">Transportation</h1>
     </div>
   )
 }

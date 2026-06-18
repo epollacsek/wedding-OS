@@ -12,7 +12,7 @@ export default function CommsPage() {
           Communications
         </span>
       </nav>
-      <h1 className="mt-4 text-[32px] font-bold leading-10 text-[#1B1B1B]">Communications</h1>
+      <h1 className="mt-4 text-[37px] font-bold leading-10 text-[#1B1B1B]">Communications</h1>
     </div>
   )
 }

@@ -128,7 +128,7 @@ export function LeftNav({
   /* ── COLLAPSED: icon-only, transparent (gradient shows through) ── */
   if (collapsed) {
     return (
-      <aside className="relative h-[calc(100vh-84px)] w-[78px] shrink-0 flex flex-col">
+      <aside className="relative h-[calc(100vh-84px)] w-[92px] shrink-0 flex flex-col">
         <nav className="flex-1 py-5 pb-24 flex flex-col items-center gap-2">
           {NAV.map(item => {
             const Icon = item.icon
@@ -146,7 +146,7 @@ export function LeftNav({
                   <Icon className="size-[26px] text-[#1B1B1B]" />
                 </Link>
 
-                <div className="pointer-events-none absolute left-[66px] top-0 z-50 min-w-48 rounded-2xl border border-[#1B1B1B]/10 bg-white px-3 py-3 opacity-0 shadow-[0_8px_24px_rgba(27,27,27,0.16)] transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+                <div className="pointer-events-none absolute left-20 top-0 z-50 min-w-48 rounded-2xl border border-[#1B1B1B]/10 bg-white px-3 py-3 opacity-0 shadow-[0_8px_24px_rgba(27,27,27,0.16)] transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
                   <p className="px-1.5 pb-1 text-xs font-semibold text-[#1B1B1B]/70">
                     {item.label}
                   </p>
@@ -185,7 +185,7 @@ export function LeftNav({
 
   /* ── EXPANDED: transparent (gradient shows through) ── */
   return (
-    <aside className="relative h-[calc(100vh-84px)] w-[300px] shrink-0 flex flex-col">
+    <aside className="relative h-[calc(100vh-84px)] w-[340px] shrink-0 flex flex-col">
       <nav className="flex-1 px-4 py-5 pb-24 flex flex-col gap-2">
         {NAV.map(item => {
           const Icon = item.icon
@@ -198,7 +198,7 @@ export function LeftNav({
               {hasChildren ? (
                 <div
                   className={cn(
-                    'flex items-center gap-3 h-11 px-2.5 rounded-lg text-[17px] transition-colors cursor-pointer select-none',
+                    'flex items-center gap-3 h-11 px-[17px] rounded-lg text-[17px] transition-colors cursor-pointer select-none',
                     active ? 'bg-aroos-content font-medium text-[#1B1B1B]' : 'font-normal text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.05]'
                   )}
                   onClick={() => toggleModule(item.href)}
@@ -213,7 +213,7 @@ export function LeftNav({
                 <Link
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 h-11 px-2.5 rounded-lg text-[17px] transition-colors',
+                    'flex items-center gap-3 h-11 px-[17px] rounded-lg text-[17px] transition-colors',
                     active ? 'bg-aroos-content font-medium text-[#1B1B1B]' : 'font-normal text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.05]'
                   )}
                 >
@@ -245,7 +245,7 @@ export function LeftNav({
         })}
       </nav>
 
-      <div className="absolute bottom-8 left-[19px]">
+      <div className="absolute bottom-8 left-[26px]">
         <button
           onClick={onToggle}
           className="size-10 flex items-center justify-center rounded-lg hover:bg-[#1B1B1B]/[0.05] transition-colors"

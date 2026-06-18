@@ -38,7 +38,7 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
           <div
             className={cn(
               'fixed right-0 top-4 z-[90]',
-              collapsed ? 'left-[78px]' : 'left-[300px]'
+              collapsed ? 'left-[92px]' : 'left-[340px]'
             )}
           >
             <div className="absolute left-1/2 flex h-11 w-[min(560px,calc(100%_-_48px))] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 shadow-[0_10px_32px_rgba(27,27,27,0.18)] origin-center animate-in fade-in zoom-in-50 duration-500 xl:h-[52px] xl:w-[min(846px,calc(90%_-_48px))] xl:px-5">
@@ -66,7 +66,9 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
         href="/home"
         className={cn(
           'flex items-center shrink-0 transition-[width] duration-200',
-          collapsed ? 'w-[78px] justify-center' : 'w-[300px]'
+          collapsed
+            ? 'absolute left-0 top-0 h-full w-[92px] justify-center'
+            : 'w-[340px] justify-start'
         )}
       >
         <span className="text-[#1B1B1B] font-bold text-[28px] tracking-tight leading-none">
@@ -76,20 +78,20 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
 
       <div
         className={cn(
-          'pointer-events-none absolute right-0 top-1/2 z-10 flex -translate-y-1/2 justify-start pl-4 min-[1500px]:justify-center min-[1500px]:pl-0',
-          collapsed ? 'left-[78px]' : 'left-[300px]'
+          'pointer-events-none absolute right-0 top-1/2 z-10 flex -translate-y-1/2 justify-start min-[1500px]:justify-center',
+          collapsed ? 'left-[92px]' : 'left-[340px]'
         )}
       >
         <button
           type="button"
-          className="pointer-events-auto h-12 w-[min(430px,calc(100%_-_260px))] min-w-44 flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover min-[1500px]:w-[min(713px,calc(90%_-_48px))]"
+          className="pointer-events-auto h-12 w-[min(520px,calc(100%_-_240px))] min-w-44 flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover min-[1500px]:w-[min(713px,calc(90%_-_48px))]"
           aria-expanded={searchOpen}
           onClick={() => setSearchOpen(true)}
           onPointerDown={() => setSearchOpen(true)}
         >
           <Search className="size-[22px] shrink-0 text-[#1B1B1B]/70" />
           <span className="min-w-0 flex-1 truncate text-[19px] font-normal text-[#1B1B1B]/75">
-            Search guests, vendors, pages or ask Aroos AI
+            Search guests, vendors, pages or ask AI
           </span>
         </button>
       </div>
@@ -125,7 +127,7 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
 
 function SettingsIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 256 288" fill="currentColor" aria-hidden="true" {...props}>
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" {...props}>
       <path d="M216,130.16q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z" />
     </svg>
   )

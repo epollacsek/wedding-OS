@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 export const metadata: Metadata = {
-  title: 'Aroos — Wedding OS',
+  title: 'Aroos - Wedding OS',
   description: 'Your wedding, beautifully managed.',
 }
 

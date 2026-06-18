@@ -2,9 +2,41 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/*
+ * Aroos — Global Styles
+ *
+ * HOW THE TOKEN SYSTEM WORKS
+ * ─────────────────────────────────────────────────────────────────
+ * 1. Raw palette values are defined as CSS custom properties in :root
+ *    under the --aroos-* namespace (e.g. --aroos-chrome: #CBBDEA).
+ *
+ * 2. Those raw variables are exposed to Tailwind v4 via @theme inline
+ *    under the --color-aroos-* namespace. This makes Tailwind generate
+ *    utility classes like bg-aroos-chrome, text-aroos-accent, etc.
+ *
+ * 3. Components use only the Tailwind token classes — never hardcoded
+ *    hex values. This means changing a single variable in :root
+ *    retheming the entire platform with no component changes needed.
+ *
+ * TO RETHEME: edit the --aroos-* values in :root below. Nothing else.
+ * ─────────────────────────────────────────────────────────────────
+ *
+ * The shadcn/ui tokens below (@theme inline --color-background etc.)
+ * are owned by shadcn — do not edit them. They power the component
+ * primitives in src/components/ui/ and should be treated as read-only.
+ */
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── Aroos design tokens ── change these to retheme the entire platform */
+  --color-aroos-chrome: var(--aroos-chrome);
+  --color-aroos-chrome-hover: var(--aroos-chrome-hover);
+  --color-aroos-avatar: var(--aroos-avatar);
+  --color-aroos-content: var(--aroos-content);
+  --color-aroos-accent: var(--aroos-accent);
+  --color-aroos-text: var(--aroos-text);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -49,6 +81,16 @@
 }
 
 :root {
+  /* ── Aroos palette — edit here, everything updates ── */
+  --aroos-bg-from: rgb(225, 215, 251);   /* page gradient top (lavender) */
+  --aroos-bg-to:   rgb(247, 245, 242);   /* page gradient bottom (warm off-white) */
+  --aroos-chrome:        #CBBDEA;        /* topnav buttons, search bar, profile pill */
+  --aroos-chrome-hover:  #BFAFE4;        /* hover on all chrome elements */
+  --aroos-avatar:        #B8A8DD;        /* user avatar background */
+  --aroos-content:       #FAFAFA;        /* content area bg + active nav item bg */
+  --aroos-accent:        #5938B7;        /* primary accent — links, highlights */
+  --aroos-text:          #1B1B1B;        /* all body text and icons */
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,10 +163,18 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    background: linear-gradient(var(--aroos-bg-from) 0%, var(--aroos-bg-to) 100%) fixed;
+    background-attachment: fixed;
+  }
+  body {
+    color: rgb(27, 27, 27);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    /* Fixed lavender → warm off-white gradient, full viewport, does not scroll */
+    background: linear-gradient(var(--aroos-bg-from) 0%, var(--aroos-bg-to) 100%) fixed;
+    background-attachment: fixed;
   }
 }

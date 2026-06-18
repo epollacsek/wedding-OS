@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function GuestsPage() {
+export default function CommsPage() {
   return (
     <div className="px-8 pt-6 pb-8">
       <nav className="flex items-center gap-2 text-sm font-normal text-[#1B1B1B]/55" aria-label="Breadcrumb">
@@ -9,10 +9,10 @@ export default function GuestsPage() {
         </Link>
         <span aria-hidden="true">/</span>
         <span className="text-[#1B1B1B]/70" aria-current="page">
-          Guest Directory
+          Communications
         </span>
       </nav>
-      <h1 className="mt-4 text-[32px] font-bold leading-10 text-[#1B1B1B]">Guest Directory</h1>
+      <h1 className="mt-4 text-[32px] font-bold leading-10 text-[#1B1B1B]">Communications</h1>
     </div>
   )
 }

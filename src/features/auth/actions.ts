@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, createServiceClient } from '@/lib/supabase/server'
 import { organizerSignUpSchema, signInSchema } from './schema'
 import type { OrganizerSignUpInput, SignInInput } from './schema'
 
@@ -21,7 +21,7 @@ export async function signIn(input: SignInInput) {
     return { error: 'Invalid email or password' }
   }
 
-  redirect('/home')
+  redirect('/events')
 }
 
 export async function signUpOrganizer(input: OrganizerSignUpInput) {
@@ -41,9 +41,9 @@ export async function signUpOrganizer(input: OrganizerSignUpInput) {
     return { error: authError?.message ?? 'Could not create account' }
   }
 
-  const { error: profileError } = await supabase.from('profiles').insert({
+  const { error: profileError } = await createServiceClient().from('profiles').insert({
     id: authData.user.id,
-    persona_type: 'organizer',
+    persona_type: 'host',
     full_name: parsed.data.full_name,
     whatsapp: parsed.data.whatsapp,
     cpf: parsed.data.cpf.replace(/\D/g, ''),

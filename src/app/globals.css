@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "flag-icons/css/flag-icons.min.css";
 
 /*
  * Aroos — Global Styles
@@ -157,6 +158,37 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@keyframes login-card-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -50%, 0); }
+}
+
+.login-card-track {
+  animation-name: login-card-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.login-card-track--0 {
+  animation-duration: 90s;
+}
+
+.login-card-track--1 {
+  animation-duration: 110s;
+}
+
+.login-card-track--2 {
+  animation-duration: 100s;
+}
+
+.login-card-track--3 {
+  animation-duration: 120s;
+}
+
+.login-card-track--4 {
+  animation-duration: 105s;
 }
 
 @layer base {

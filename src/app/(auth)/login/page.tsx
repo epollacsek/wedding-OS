@@ -11,50 +11,57 @@ type ShowcaseCard = {
   label?: string
   className: string
   body: 'browser' | 'poster' | 'report' | 'timeline' | 'phone' | 'minimal'
+  size: 'sm' | 'md' | 'lg'
+}
+
+const sizeClass = {
+  sm: 'min-h-[140px] xl:min-h-[160px]',
+  md: 'min-h-[210px] xl:min-h-[240px]',
+  lg: 'min-h-[300px] xl:min-h-[340px]',
 }
 
 // Placeholder showcase cards. Replace this data/art direction once final event templates are generated.
 const columns: ShowcaseCard[][] = [
   [
-    { title: 'Browse Objects on VC', subtitle: 'SHOP NOW', label: 'Gallery launch', className: 'bg-[#2F2B25] text-white', body: 'browser' },
-    { title: 'SALO-SALO', subtitle: 'Ika 15 ng Nobyembre', label: 'Pista ng Pagkaing Pinoy', className: 'bg-[#FFCBAA] text-[#22160E]', body: 'poster' },
-    { title: 'SOURCE LOCALMENT', subtitle: 'Field dinner invitation', className: 'bg-[#9DAF86] text-white', body: 'poster' },
-    { title: 'YUNA KASUMI', subtitle: '1990', className: 'bg-[#FFE4C8] text-[#1B1B1B]', body: 'poster' },
+    { title: 'Browse Objects on VC', subtitle: 'SHOP NOW', label: 'Gallery launch', className: 'bg-[#2F2B25] text-white', body: 'browser', size: 'lg' },
+    { title: 'SALO-SALO', subtitle: 'Ika 15 ng Nobyembre', label: 'Pista ng Pagkaing Pinoy', className: 'bg-[#FFCBAA] text-[#22160E]', body: 'poster', size: 'sm' },
+    { title: 'SOURCE LOCALMENT', subtitle: 'Field dinner invitation', className: 'bg-[#9DAF86] text-white', body: 'poster', size: 'md' },
+    { title: 'YUNA KASUMI', subtitle: '1990', className: 'bg-[#FFE4C8] text-[#1B1B1B]', body: 'poster', size: 'lg' },
   ],
   [
-    { title: 'Thank you!', subtitle: 'Post-event note', className: 'bg-white text-[#1B1B1B]', body: 'minimal' },
-    { title: 'INUSIDE', subtitle: 'October 2024', className: 'bg-[#111322] text-white', body: 'poster' },
-    { title: 'build', subtitle: 'Summit keynote', className: 'bg-[#FF5B36] text-[#FFE66D]', body: 'poster' },
-    { title: 'THE LAST VISITOR', subtitle: 'Experience opening night', className: 'bg-[#09151F] text-[#F6D15B]', body: 'poster' },
+    { title: 'Thank you!', subtitle: 'Post-event note', className: 'bg-white text-[#1B1B1B]', body: 'minimal', size: 'sm' },
+    { title: 'INUSIDE', subtitle: 'October 2024', className: 'bg-[#111322] text-white', body: 'poster', size: 'lg' },
+    { title: 'build', subtitle: 'Summit keynote', className: 'bg-[#FF5B36] text-[#FFE66D]', body: 'poster', size: 'sm' },
+    { title: 'THE LAST VISITOR', subtitle: 'Experience opening night', className: 'bg-[#09151F] text-[#F6D15B]', body: 'poster', size: 'md' },
   ],
   [
-    { title: 'Kustenruhe', subtitle: 'Wellness retreat board', className: 'bg-[#A9C2C8] text-white', body: 'minimal' },
-    { title: 'COMPANY REVIEW', subtitle: 'Quarterly deck', className: 'bg-[#EEE9FF] text-white', body: 'minimal' },
-    { title: 'CONCEPT PROPOSAL', subtitle: 'Brand system preview', className: 'bg-[#7C67D9] text-white', body: 'minimal' },
-    { title: 'how to plan your next content', subtitle: 'A starter guide', className: 'bg-[#4A4946] text-white', body: 'browser' },
-    { title: 'creative strategy', subtitle: '2024', className: 'bg-[#3B2E9E] text-white', body: 'minimal' },
+    { title: 'Kustenruhe', subtitle: 'Wellness retreat board', className: 'bg-[#A9C2C8] text-white', body: 'minimal', size: 'md' },
+    { title: 'COMPANY REVIEW', subtitle: 'Quarterly deck', className: 'bg-[#EEE9FF] text-white', body: 'minimal', size: 'sm' },
+    { title: 'CONCEPT PROPOSAL', subtitle: 'Brand system preview', className: 'bg-[#7C67D9] text-white', body: 'minimal', size: 'lg' },
+    { title: 'how to plan your next content', subtitle: 'A starter guide', className: 'bg-[#4A4946] text-white', body: 'browser', size: 'sm' },
+    { title: 'creative strategy', subtitle: '2024', className: 'bg-[#3B2E9E] text-white', body: 'minimal', size: 'md' },
   ],
   [
-    { title: 'MANAGEMENT REPORT FINANCIAL RISK', subtitle: 'Market volatility analysis', className: 'bg-white text-[#1B1B1B]', body: 'report' },
-    { title: 'marketing report', subtitle: 'Campaign performance', className: 'bg-[#0E4A83] text-white', body: 'minimal' },
-    { title: 'new podcast alert', subtitle: '10 PM PST - OCTOBER 31 2024', className: 'bg-[#1F2D27] text-white', body: 'phone' },
-    { title: 'MATCHA', subtitle: 'Workshop tasting card', className: 'bg-[#A7BE74] text-white', body: 'poster' },
+    { title: 'MANAGEMENT REPORT FINANCIAL RISK', subtitle: 'Market volatility analysis', className: 'bg-white text-[#1B1B1B]', body: 'report', size: 'sm' },
+    { title: 'marketing report', subtitle: 'Campaign performance', className: 'bg-[#0E4A83] text-white', body: 'minimal', size: 'lg' },
+    { title: 'new podcast alert', subtitle: '10 PM PST - OCTOBER 31 2024', className: 'bg-[#1F2D27] text-white', body: 'phone', size: 'sm' },
+    { title: 'MATCHA', subtitle: 'Workshop tasting card', className: 'bg-[#A7BE74] text-white', body: 'poster', size: 'md' },
   ],
   [
-    { title: 'The New App Product Launch', subtitle: 'Release event', className: 'bg-[#1E1369] text-white', body: 'phone' },
-    { title: 'new perspective', subtitle: 'Design meetup', className: 'bg-[#4DAEBD] text-white', body: 'minimal' },
-    { title: 'The Business Timeline', subtitle: '2012 - 2018', className: 'bg-white text-[#1B1B1B]', body: 'timeline' },
-    { title: 'software engineer', subtitle: 'Hiring card', className: 'bg-[#845FE7] text-white', body: 'browser' },
+    { title: 'The New App Product Launch', subtitle: 'Release event', className: 'bg-[#1E1369] text-white', body: 'phone', size: 'lg' },
+    { title: 'new perspective', subtitle: 'Design meetup', className: 'bg-[#4DAEBD] text-white', body: 'minimal', size: 'sm' },
+    { title: 'The Business Timeline', subtitle: '2012 - 2018', className: 'bg-white text-[#1B1B1B]', body: 'timeline', size: 'md' },
+    { title: 'software engineer', subtitle: 'Hiring card', className: 'bg-[#845FE7] text-white', body: 'browser', size: 'lg' },
   ],
 ]
 
 const columnOffsets = ['-mt-20', 'mt-10', '-mt-8', 'mt-16', '-mt-24']
-const columnDurations = [
-  '[animation-duration:90s]',
-  '[animation-duration:110s]',
-  '[animation-duration:100s]',
-  '[animation-duration:120s]',
-  '[animation-duration:105s]',
+const columnAnimations = [
+  'login-card-track--0',
+  'login-card-track--1',
+  'login-card-track--2',
+  'login-card-track--3',
+  'login-card-track--4',
 ]
 const BRAND_NAME = 'aroos'
 const BRAND_COPYRIGHT = '© 2026 Aroos, Inc.'
@@ -62,11 +69,11 @@ const CARD_SEQUENCE_REPEATS = 6
 
 function ShowcaseCardPreview({ card }: { card: ShowcaseCard }) {
   return (
-    <article className={`min-h-[270px] overflow-hidden rounded-2xl p-5 shadow-[0_18px_40px_rgba(20,38,64,0.18)] ${card.className}`}>
+    <article className={`overflow-hidden rounded-2xl p-4 shadow-[0_18px_40px_rgba(20,38,64,0.18)] xl:p-5 ${sizeClass[card.size]} ${card.className}`}>
       {card.label && <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] opacity-70">{card.label}</p>}
       <div className="flex min-h-40 flex-col justify-between">
         <div>
-          <h2 className="text-[22px] font-black leading-[1.05] tracking-tight">{card.title}</h2>
+          <h2 className="text-[19px] font-black leading-[1.05] tracking-tight xl:text-[22px]">{card.title}</h2>
           <p className="mt-2 text-xs opacity-75">{card.subtitle}</p>
         </div>
         <CardBody kind={card.body} />
@@ -169,16 +176,16 @@ export default function LoginPage() {
     <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_58%_10%,rgba(255,255,255,0.46),transparent_30%),linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0)_42%,rgba(255,255,255,0.42)_62%,rgba(255,255,255,0)_82%)]" />
 
-      <section className="pointer-events-none absolute bottom-[-120vh] right-[-30vw] top-[-56vh] hidden w-[118vw] rotate-[-12deg] lg:block">
-        <div className="flex min-h-full justify-end gap-6">
+      <section className="pointer-events-none absolute bottom-[-120vh] right-[-56vw] top-[-56vh] z-0 hidden w-[138vw] rotate-[-12deg] [mask-image:linear-gradient(90deg,transparent_0%,transparent_40%,rgba(0,0,0,0.28)_52%,black_64%,black_100%)] lg:block xl:right-[-34vw] xl:w-[124vw] xl:[mask-image:linear-gradient(90deg,transparent_0%,transparent_27%,rgba(0,0,0,0.35)_36%,black_47%,black_100%)]">
+        <div className="flex min-h-full justify-end gap-5 xl:gap-6">
           {[...columns, ...columns.slice(0, 3)].map((column, index) => (
             <div
               key={index}
-              className={`h-full w-[280px] shrink-0 overflow-hidden ${columnOffsets[index % columnOffsets.length]}`}
+              className={`h-full w-[230px] shrink-0 overflow-hidden xl:w-[280px] ${columnOffsets[index % columnOffsets.length]}`}
             >
-              <div className={`flex animate-[login-card-drift_linear_infinite] flex-col will-change-transform ${columnDurations[index % columnDurations.length]}`}>
+              <div className={`login-card-track flex flex-col will-change-transform ${columnAnimations[index % columnAnimations.length]}`}>
                 {[0, 1].map((group) => (
-                  <div key={group} className="flex flex-col gap-6">
+                  <div key={group} className="flex flex-col gap-6 pb-6">
                     {Array.from({ length: CARD_SEQUENCE_REPEATS }).flatMap(() => column).map((card, cardIndex) => (
                       <ShowcaseCardPreview key={`${group}-${card.title}-${cardIndex}`} card={card} />
                     ))}
@@ -191,10 +198,10 @@ export default function LoginPage() {
       </section>
 
       <section className="relative z-10 flex min-h-screen w-full flex-col px-10 py-9 text-[#1B1B1B] sm:px-16 lg:w-[44%] lg:px-24">
-        <div className="relative mx-auto w-full max-w-[520px] flex-1 pt-[18vh]">
-          <h1 className="text-[56px] font-normal leading-none tracking-[-0.03em] text-[#1B1B1B]">Sign in</h1>
+        <div className="relative mx-auto w-full max-w-[520px] flex-1 pt-[18vh] lg:-translate-x-[10%] lg:translate-y-[2vh]">
+          <h1 className="translate-y-[4vh] text-[56px] font-normal leading-none tracking-[-0.03em] text-[#1B1B1B]">Sign in</h1>
 
-          <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2">
+          <div className="absolute left-0 right-0 top-[54%] -translate-y-1/2">
             <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-[#1B1B1B]">
               <div className="flex flex-col gap-3">
                 <label htmlFor="email" className="text-[22px] font-normal">Email</label>
@@ -204,7 +211,8 @@ export default function LoginPage() {
                   type="email"
                   required
                   autoComplete="email"
-                  className="h-[52px] rounded-md border border-[#B9C0C9] bg-white px-5 text-[22px] text-[#1B1B1B] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
+                  placeholder="you@example.com"
+                  className="h-[52px] rounded-md border border-[#B9C0C9] bg-white px-5 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
                 />
               </div>
 
@@ -217,7 +225,8 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     required
                     autoComplete="current-password"
-                    className="h-[52px] w-full rounded-md border border-[#B9C0C9] bg-white px-5 pr-12 text-[22px] text-[#1B1B1B] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
+                    placeholder="••••••••"
+                    className="h-[52px] w-full rounded-md border border-[#B9C0C9] bg-white px-5 pr-12 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
                   />
                   <button
                     type="button"
@@ -259,16 +268,7 @@ export default function LoginPage() {
           </div>
         </div>
       </section>
-      <style jsx global>{`
-        @keyframes login-card-drift {
-          from {
-            transform: translate3d(0, 0, 0);
-          }
-          to {
-            transform: translate3d(0, -50%, 0);
-          }
-        }
-      `}</style>
+
     </main>
   )
 }

@@ -52,8 +52,32 @@ Before building any new page or component, read the relevant reference first.
 | Breadcrumb + page title | Same file — top of the JSX |
 | Data table with filter bar | Same file — full pattern |
 | Empty state | Same file — inside the table |
+| Login / auth entry page | `src/app/(auth)/login/page.tsx` |
 
 If a pattern you need doesn't exist yet, build it in the most obvious location and add it to this table.
+
+---
+
+## Login Page — Preserve The Gamma-Style Card Wall
+
+The login page is an intentionally custom auth experience. It is owned by:
+
+- `src/app/(auth)/login/page.tsx` — layout, form, placeholder card data, responsive positioning
+- `src/app/globals.css` — `login-card-drift` keyframes and `.login-card-track*` animation classes
+
+Do not replace it with a centered auth card, split panel, dashboard shell, or generic shadcn login screen.
+
+Required behavior:
+
+1. The page uses the same global Aroos lavender-to-warm-off-white background gradient as the rest of the product.
+2. The left side contains the login session: `Sign in` title, email input, password input, forgot password link, sign-in button, sign-up link, and placeholder brand mark.
+3. The right side is a continuous tilted wall of placeholder event/template cards. It should feel like one flowing canvas, not a divided right panel.
+4. Cards move upward continuously using the shared CSS animation classes in `globals.css`. Do not rely on inline styles for animation timing.
+5. The card wall fades under the login side using a mask so the form remains readable. Do not add a hard vertical divider.
+6. At split-screen/tablet widths, keep the same composition but reduce card size and push the wall visually right so the login session does not become crowded.
+7. Card data is placeholder content. It can be replaced later with generated event cards, but preserve the layout and animation system.
+
+When adjusting this page, prefer small positional changes to the existing wrapper classes. Do not rebuild the page from scratch.
 
 ---
 

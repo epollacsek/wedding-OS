@@ -25,6 +25,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  if (process.env.NODE_ENV === 'development') {
+    return supabaseResponse
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   const publicPaths = ['/login', '/signup', '/onboarding', '/rsvp']

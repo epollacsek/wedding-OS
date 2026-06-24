@@ -1,4 +1,4 @@
-export type PersonaType = 'organizer' | 'planner' | 'vendor' | 'worker'
+export type PersonaType = 'host' | 'planner' | 'vendor' | 'worker'
 
 export interface Profile {
   id: string

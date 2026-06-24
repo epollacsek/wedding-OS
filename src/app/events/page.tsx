@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Users, Calendar } from 'lucide-react'
 
 type MockEvent = {
   id: string
@@ -7,8 +7,8 @@ type MockEvent = {
   type: 'Wedding' | 'Corporate' | 'Birthday' | 'Other'
   date: string | null
   guestCount: number
-  initials: string
-  color: string
+  coverGradient: string
+  accentColor: string
 }
 
 // Mock data — replaced by real DB query once events migration is live
@@ -19,8 +19,8 @@ const MOCK_EVENTS: MockEvent[] = [
     type: 'Wedding',
     date: '2027-06-12',
     guestCount: 180,
-    initials: 'EA',
-    color: 'bg-[#CBBDEA]',
+    coverGradient: 'linear-gradient(135deg, #CBBDEA 0%, #9B87D9 50%, #7C67C8 100%)',
+    accentColor: '#5938B7',
   },
   {
     id: 'evt_2',
@@ -28,16 +28,16 @@ const MOCK_EVENTS: MockEvent[] = [
     type: 'Corporate',
     date: '2026-09-20',
     guestCount: 40,
-    initials: 'AR',
-    color: 'bg-[#A9C2C8]',
+    coverGradient: 'linear-gradient(135deg, #A9C2C8 0%, #7BA8B2 50%, #4A8A97 100%)',
+    accentColor: '#0E4A83',
   },
 ]
 
-const TYPE_BADGE: Record<MockEvent['type'], string> = {
-  Wedding:   'bg-[#EEE9FF] text-[#5938B7]',
-  Corporate: 'bg-[#E6F0F5] text-[#0E4A83]',
-  Birthday:  'bg-[#FFF3E6] text-[#B85C00]',
-  Other:     'bg-[#F0F0F0] text-[#555]',
+const TYPE_LABEL: Record<MockEvent['type'], string> = {
+  Wedding: 'Wedding',
+  Corporate: 'Corporate event',
+  Birthday: 'Birthday',
+  Other: 'Event',
 }
 
 function formatDate(iso: string) {
@@ -48,15 +48,23 @@ function daysUntil(iso: string) {
   const diff = Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000)
   if (diff < 0) return null
   if (diff === 0) return 'Today'
+  if (diff === 1) return 'Tomorrow'
   return `${diff} days away`
 }
 
+// Grid columns based on event count — fills the screen naturally
+function gridClass(count: number) {
+  if (count === 1) return 'grid-cols-1 max-w-lg'
+  if (count === 2) return 'grid-cols-2'
+  if (count === 3) return 'grid-cols-3'
+  return 'grid-cols-2'  // 4+ wraps into 2-col rows
+}
+
 export default function EventsPage() {
-  // Auto-skip: if exactly 1 event, go straight in (add redirect logic here once real DB is wired)
-  // For now we always show the picker since MOCK_EVENTS has 2 entries
+  const total = MOCK_EVENTS.length
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
+    <main className="flex min-h-screen flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
       <header className="flex items-center justify-between px-8 py-6">
         <span className="text-[28px] font-bold leading-none tracking-tight text-[#1B1B1B]">
           aroos.
@@ -69,7 +77,7 @@ export default function EventsPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-6 pt-12 pb-24">
+      <section className="flex flex-1 flex-col px-8 pt-4 pb-10">
         <h1 className="text-[38px] font-bold leading-tight tracking-tight text-[#1B1B1B]">
           Your events
         </h1>
@@ -77,59 +85,81 @@ export default function EventsPage() {
           Pick an event to continue, or create a new one.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {MOCK_EVENTS.map(event => (
-            <Link
-              key={event.id}
-              href="/home"
-              className="group flex flex-col rounded-2xl border border-[#1B1B1B]/08 bg-white/70 p-6 shadow-sm backdrop-blur-sm transition-all hover:border-aroos-accent/40 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className={`size-12 rounded-xl ${event.color} flex items-center justify-center text-base font-bold text-[#1B1B1B] shrink-0`}>
-                  {event.initials}
+        {/* Event cards — evenly split across full width, grow to fill space */}
+        <div className={`mt-[5vh] grid gap-5 ${gridClass(total)}`}>
+          {MOCK_EVENTS.map(event => {
+            const days = event.date ? daysUntil(event.date) : null
+            return (
+              <Link
+                key={event.id}
+                href="/home"
+                className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1"
+              >
+                {/* Cover */}
+                <div
+                  className="relative w-full h-[52vh]"
+                  style={{ background: event.coverGradient }}
+                >
+                  <div className="absolute left-4 top-4">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm">
+                      {TYPE_LABEL[event.type]}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[40%]">
+                    <div className="size-[100px] rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center text-[26px] font-bold text-[#1B1B1B]">
+                      {event.name.split(' ').slice(0, 2).map(w => w[0]).join('')}
+                    </div>
+                  </div>
                 </div>
-                <span className={`mt-0.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${TYPE_BADGE[event.type]}`}>
-                  {event.type}
-                </span>
-              </div>
 
-              <div className="mt-4 flex-1">
-                <h2 className="text-[18px] font-semibold leading-snug text-[#1B1B1B] group-hover:text-aroos-accent transition-colors">
-                  {event.name}
-                </h2>
-                {event.date && (
-                  <p className="mt-1 text-sm text-[#1B1B1B]/50">
-                    {formatDate(event.date)}
-                    {daysUntil(event.date) && (
-                      <span className="ml-2 text-aroos-accent font-medium">{daysUntil(event.date)}</span>
+                {/* Content */}
+                <div className="flex flex-col px-6 pb-6 pt-12 text-center">
+                  <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
+                    {event.name}
+                  </h2>
+                  {event.date && (
+                    <p className="mt-1.5 text-[14px] text-[#1B1B1B]/50">
+                      {formatDate(event.date)}
+                    </p>
+                  )}
+                  {days && (
+                    <span
+                      className="mx-auto mt-3 rounded-full px-3 py-1 text-[13px] font-semibold text-white"
+                      style={{ backgroundColor: event.accentColor }}
+                    >
+                      {days}
+                    </span>
+                  )}
+                  <div className="mt-5 flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
+                    <span className="flex items-center gap-1.5">
+                      <Users className="size-4" />
+                      {event.guestCount} guests
+                    </span>
+                    {event.date && (
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="size-4" />
+                        {new Date(event.date).getFullYear()}
+                      </span>
                     )}
-                  </p>
-                )}
-              </div>
-
-              <div className="mt-5 flex items-center gap-1.5 border-t border-[#1B1B1B]/06 pt-4">
-                <div className="flex -space-x-1">
-                  {Array.from({ length: Math.min(3, Math.ceil(event.guestCount / 60)) }).map((_, i) => (
-                    <div key={i} className="size-5 rounded-full bg-aroos-chrome border-2 border-white" />
-                  ))}
+                  </div>
                 </div>
-                <span className="text-sm text-[#1B1B1B]/50">
-                  {event.guestCount} guests
-                </span>
-              </div>
-            </Link>
-          ))}
-
-          <Link
-            href="/onboarding/organizer"
-            className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#1B1B1B]/15 bg-transparent p-6 text-[#1B1B1B]/40 transition-all hover:border-aroos-accent/40 hover:text-aroos-accent hover:bg-white/40 min-h-[180px]"
-          >
-            <div className="size-10 rounded-full border-2 border-current flex items-center justify-center">
-              <Plus className="size-5" />
-            </div>
-            <span className="text-[15px] font-medium">New event</span>
-          </Link>
+              </Link>
+            )
+          })}
         </div>
+
+        {/* Add new — full width bar at the bottom */}
+        <Link
+          href="/onboarding/organizer"
+          className="group mt-5 flex w-full items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-[#1B1B1B]/15 bg-white/40 py-5 transition-all duration-300 hover:border-aroos-accent/50 hover:bg-white/70"
+        >
+          <div className="size-8 rounded-full border-2 border-[#1B1B1B]/25 flex items-center justify-center transition-colors group-hover:border-aroos-accent group-hover:text-aroos-accent text-[#1B1B1B]/30">
+            <Plus className="size-4" />
+          </div>
+          <span className="text-[16px] font-semibold text-[#1B1B1B]/40 transition-colors group-hover:text-aroos-accent">
+            New event
+          </span>
+        </Link>
       </section>
     </main>
   )

@@ -30,12 +30,11 @@ export const organizerSignUpSchema = z.object({
     .string()
     .min(10, 'Enter a valid WhatsApp number')
     .regex(/^\+?[\d\s\-().]+$/, 'Enter a valid phone number'),
-  cpf: z
-    .string()
-    .refine(validateCpf, 'Enter a valid CPF'),
+  nationality: z.string().min(1, 'Select your nationality'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters'),
+  birth_date: z.string().min(1, 'Enter your date of birth'),
 })
 
 export type SignInInput = z.infer<typeof signInSchema>

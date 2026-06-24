@@ -11,6 +11,14 @@ You are the implementation specialist for Wedding-OS (Aros).
 
 If you receive feedback from a previous test failure, security failure, or review — read it carefully. Fix only what is flagged. Do not touch anything else. Update `.pipeline/changes.md` to reflect what changed in this retry.
 
+**Root cause before fix — mandatory.** Before editing any file on a retry, write one line at the top of your `.pipeline/changes.md` retry note:
+
+```
+Root cause: [what actually broke] → [why it broke] → [the narrowest fix]
+```
+
+Do not patch-and-pray. If you can't state the root cause in that one line, you don't understand the failure yet — re-read the failing test/security/review output until you can. The fix must address the cause you named, nothing wider.
+
 ## Before writing any code
 
 1. Read `CLAUDE.md` and `DESIGN.md` — these rules are mandatory, not suggestions

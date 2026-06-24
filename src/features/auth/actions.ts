@@ -46,7 +46,8 @@ export async function signUpOrganizer(input: OrganizerSignUpInput) {
     persona_type: 'host',
     full_name: parsed.data.full_name,
     whatsapp: parsed.data.whatsapp,
-    cpf: parsed.data.cpf.replace(/\D/g, ''),
+    nationality: parsed.data.nationality,
+    birth_date: parsed.data.birth_date,
   })
 
   if (profileError) {

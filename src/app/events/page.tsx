@@ -52,6 +52,17 @@ function daysUntil(iso: string) {
   return `${diff} days away`
 }
 
+function eventInitials(name: string): { letters: string; compact: boolean } {
+  // Detect "Person1 & Person2's ..." pattern
+  const match = name.match(/^(\S+)\s*&\s*(\S+)/)
+  if (match) {
+    return { letters: `${match[1][0]}&${match[2][0]}`, compact: true }
+  }
+  // Fallback: first two words' initials
+  const words = name.split(' ').filter(w => w.length > 1)
+  return { letters: words.slice(0, 2).map(w => w[0]).join(''), compact: false }
+}
+
 // Grid columns based on event count — fills the screen naturally
 function gridClass(count: number) {
   if (count === 1) return 'grid-cols-1 max-w-lg'
@@ -106,9 +117,16 @@ export default function EventsPage() {
                     </span>
                   </div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[40%]">
-                    <div className="size-[100px] rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center text-[26px] font-bold text-[#1B1B1B]">
-                      {event.name.split(' ').slice(0, 2).map(w => w[0]).join('')}
-                    </div>
+                    {(() => {
+                      const { letters, compact } = eventInitials(event.name)
+                      return (
+                        <div className="size-[100px] rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center font-bold text-[#1B1B1B]">
+                          <span className="text-[26px] tracking-tight">
+                            {letters}
+                          </span>
+                        </div>
+                      )
+                    })()}
                   </div>
                 </div>
 

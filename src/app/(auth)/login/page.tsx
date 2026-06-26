@@ -198,74 +198,72 @@ export default function LoginPage() {
       </section>
 
       <section className="relative z-10 flex min-h-screen w-full flex-col px-10 py-9 text-[#1B1B1B] sm:px-16 lg:w-[44%] lg:px-24">
-        <div className="relative mx-auto w-full max-w-[520px] flex-1 pt-[18vh] lg:-translate-x-[10%] lg:translate-y-[2vh]">
-          <h1 className="translate-y-[4vh] text-[56px] font-normal leading-none tracking-[-0.03em] text-[#1B1B1B]">Sign in</h1>
+        <div className="mx-auto flex w-full max-w-[460px] flex-1 flex-col justify-center gap-8 lg:-translate-x-[5%]">
+          <h1 className="text-[56px] font-normal leading-none tracking-[-0.03em] text-[#1B1B1B]">Sign in</h1>
 
-          <div className="absolute left-0 right-0 top-[54%] -translate-y-1/2">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-[#1B1B1B]">
-              <div className="flex flex-col gap-3">
-                <label htmlFor="email" className="text-[22px] font-normal">Email</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  className="h-[52px] rounded-md border border-[#B9C0C9] bg-white px-5 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
-                />
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <label htmlFor="password" className="text-[22px] font-normal">Password</label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    className="h-[52px] w-full rounded-md border border-[#B9C0C9] bg-white px-5 pr-12 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((value) => !value)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#06275B]"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <Link href="/forgot-password" className="text-[21px] font-medium text-[#1B1B1B] underline-offset-4 hover:underline">
-                Forgot password?
-              </Link>
-
-              {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-base text-red-600">{error}</p>}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-2 h-[52px] rounded-full border border-[#C9D7EA] bg-white text-[20px] font-semibold text-[#1B1B1B] transition-colors hover:bg-[#F4F8FF] disabled:opacity-50"
-              >
-                {loading ? 'Signing in...' : 'Sign in'}
-              </button>
-            </form>
-
-            <p className="mt-8 text-center text-[18px] text-[#1B1B1B]">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="font-medium text-[#1B1B1B] underline-offset-4 hover:underline">
-                Sign up
-              </Link>
-            </p>
-
-            <div className="mt-16 text-center">
-              <p className="text-[28px] font-black tracking-[-0.06em] text-[#1B1B1B]">{BRAND_NAME}</p>
-              <p className="mt-8 text-[15px] text-[#8E8E8E]">{BRAND_COPYRIGHT}</p>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-[#1B1B1B]">
+            <div className="flex flex-col gap-3">
+              <label htmlFor="email" className="text-[22px] font-normal">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@example.com"
+                className="h-[52px] rounded-md border border-[#B9C0C9] bg-white px-5 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
+              />
             </div>
-          </div>
+
+            <div className="flex flex-col gap-3">
+              <label htmlFor="password" className="text-[22px] font-normal">Password</label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="h-[52px] w-full rounded-md border border-[#B9C0C9] bg-white px-5 pr-12 text-[22px] leading-none text-[#1B1B1B] placeholder:text-[#B9C0C9] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#06275B]"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                </button>
+              </div>
+            </div>
+
+            <Link href="/forgot-password" className="text-[21px] font-medium text-[#1B1B1B] underline-offset-4 hover:underline">
+              Forgot password?
+            </Link>
+
+            {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-base text-red-600">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 h-[52px] rounded-full border border-[#C9D7EA] bg-white text-[20px] font-semibold text-[#1B1B1B] transition-colors hover:bg-[#F4F8FF] disabled:opacity-50"
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+
+          <p className="text-center text-[18px] text-[#1B1B1B]">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-medium text-[#1B1B1B] underline-offset-4 hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
+
+        <div className="mx-auto w-full max-w-[460px] pb-2 text-center lg:-translate-x-[5%]">
+          <p className="text-[28px] font-black tracking-[-0.06em] text-[#1B1B1B]">{BRAND_NAME}</p>
+          <p className="mt-2 text-[15px] text-[#8E8E8E]">{BRAND_COPYRIGHT}</p>
         </div>
       </section>
 

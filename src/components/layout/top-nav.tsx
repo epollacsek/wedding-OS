@@ -40,7 +40,7 @@ export function TopNav({ collapsed = false, profile, activeEvent }: { collapsed?
         href="/home"
         className={cn(
           'flex items-center shrink-0 transition-[width] duration-200',
-          collapsed ? 'w-[92px] justify-center' : 'w-[340px] justify-start'
+          collapsed ? 'w-[92px] justify-start' : 'w-[340px] justify-start'
         )}
       >
         <span className="text-[#1B1B1B] font-bold text-[28px] tracking-tight leading-none">

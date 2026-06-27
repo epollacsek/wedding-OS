@@ -33,26 +33,36 @@ export function TopNav({ collapsed = false, profile, activeEvent }: { collapsed?
   }, [searchOpen])
 
   return (
-    <header className="relative h-[84px] shrink-0 flex items-center gap-4 px-6 z-50">
-      {searchOpen && (
-        <>
-          <button
-            type="button"
-            className="fixed inset-0 z-[80] cursor-default bg-[#1B1B1B]/45 animate-in fade-in duration-500"
-            aria-label="Close search"
-            onClick={() => setSearchOpen(false)}
-          />
-          <div
-            className={cn(
-              'fixed right-0 top-4 z-[90]',
-              collapsed ? 'left-[92px]' : 'left-[340px]'
-            )}
-          >
-            <div className="absolute left-1/2 flex h-11 w-[min(560px,calc(100%_-_48px))] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 shadow-[0_10px_32px_rgba(27,27,27,0.18)] origin-center animate-in fade-in zoom-in-50 duration-500 xl:h-[52px] xl:w-[min(846px,calc(90%_-_48px))] xl:px-5">
+    <header className="h-[84px] shrink-0 flex items-center gap-4 px-6 z-50">
+
+      {/* Logo — matches sidebar width */}
+      <a
+        href="/home"
+        className={cn(
+          'flex items-center shrink-0 transition-[width] duration-200',
+          collapsed ? 'w-[92px] justify-center' : 'w-[340px] justify-start'
+        )}
+      >
+        <span className="text-[#1B1B1B] font-bold text-[28px] tracking-tight leading-none">
+          {collapsed ? 'a.' : 'aroos.'}
+        </span>
+      </a>
+
+      {/* Search — flex-1 fills whatever space is left */}
+      <div className="flex-1 min-w-0 flex items-center">
+        {searchOpen ? (
+          <>
+            <button
+              type="button"
+              className="fixed inset-0 z-[80] cursor-default bg-[#1B1B1B]/45 animate-in fade-in duration-500"
+              aria-label="Close search"
+              onClick={() => setSearchOpen(false)}
+            />
+            <div className="relative z-[90] flex w-full max-w-[713px] h-[52px] items-center gap-3 rounded-full bg-white px-5 shadow-[0_10px_32px_rgba(27,27,27,0.18)] animate-in fade-in zoom-in-95 duration-200">
               <Search className="size-[22px] shrink-0 text-[#1B1B1B]/70" />
               <input
                 ref={searchInputRef}
-                className="min-w-0 flex-1 bg-transparent text-base font-normal text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/65 xl:text-[19px]"
+                className="min-w-0 flex-1 bg-transparent text-[19px] font-normal text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/65"
                 placeholder="Search guests, vendors, pages or ask Aroos AI"
                 type="search"
               />
@@ -65,45 +75,24 @@ export function TopNav({ collapsed = false, profile, activeEvent }: { collapsed?
                 <X className="m-auto size-[22px]" />
               </button>
             </div>
-          </div>
-        </>
-      )}
-
-      <a
-        href="/home"
-        className={cn(
-          'flex items-center shrink-0 transition-[width] duration-200',
-          collapsed
-            ? 'absolute left-0 top-0 h-full w-[92px] justify-center'
-            : 'w-[340px] justify-start'
+          </>
+        ) : (
+          <button
+            type="button"
+            className="h-12 w-full max-w-[520px] flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
+            aria-expanded={searchOpen}
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className="size-[22px] shrink-0 text-[#1B1B1B]/70" />
+            <span className="min-w-0 flex-1 truncate text-[19px] font-normal text-[#1B1B1B]/75">
+              Search guests, vendors, pages or ask AI
+            </span>
+          </button>
         )}
-      >
-        <span className="text-[#1B1B1B] font-bold text-[28px] tracking-tight leading-none">
-          {collapsed ? 'a.' : 'aroos.'}
-        </span>
-      </a>
-
-      <div
-        className={cn(
-          'pointer-events-none absolute right-0 top-1/2 z-10 flex -translate-y-1/2 justify-start min-[1500px]:justify-center',
-          collapsed ? 'left-[92px]' : 'left-[340px]'
-        )}
-      >
-        <button
-          type="button"
-          className="pointer-events-auto h-12 w-[min(520px,calc(100%_-_240px))] min-w-44 flex items-center gap-4 rounded-full bg-aroos-chrome px-5 text-left text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover min-[1500px]:w-[min(713px,calc(90%_-_48px))]"
-          aria-expanded={searchOpen}
-          onClick={() => setSearchOpen(true)}
-          onPointerDown={() => setSearchOpen(true)}
-        >
-          <Search className="size-[22px] shrink-0 text-[#1B1B1B]/70" />
-          <span className="min-w-0 flex-1 truncate text-[19px] font-normal text-[#1B1B1B]/75">
-            Search guests, vendors, pages or ask AI
-          </span>
-        </button>
       </div>
 
-      <div className="relative z-20 ml-auto flex items-center gap-2 shrink-0">
+      {/* Right side — shrink-0 so it never gets squeezed */}
+      <div className="flex items-center gap-2 shrink-0">
         <button className={ICON_BTN} aria-label="Aroos AI">
           <AiSparkleIcon className="size-[25px]" />
         </button>
@@ -119,12 +108,12 @@ export function TopNav({ collapsed = false, profile, activeEvent }: { collapsed?
 
         <a
           href={activeEvent ? undefined : '/events'}
-          className="h-[52px] min-w-[350px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
+          className="h-[52px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
         >
           <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
             {profile ? initials(profile.full_name) : 'EP'}
           </div>
-          <div className="min-w-0 flex-1 text-left leading-tight px-1 hidden md:block">
+          <div className="min-w-0 text-left leading-tight px-1 hidden md:block">
             <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{profile?.full_name ?? 'Eduardo Pollacsek'}</p>
             <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">
               {activeEvent ? `${activeEvent.name} | ${activeEvent.role}` : 'Select an event'}

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Plus, Users, Calendar, ChevronDown } from 'lucide-react'
 import { getProfile } from '@/features/auth/queries'
+import { selectEvent } from '@/features/events/actions'
 
 type MockEvent = {
   id: string
@@ -110,12 +111,11 @@ export default async function EventsPage() {
         <div className={`mt-10 grid gap-5 flex-1 ${gridClass(total)}`}>
           {MOCK_EVENTS.map(event => {
             const days = event.date ? daysUntil(event.date) : null
+            const role = profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'
             return (
-              <Link
-                key={event.id}
-                href="/home"
-                className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1"
+              <form key={event.id} action={selectEvent.bind(null, event.name, role)} className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer"
               >
+                <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
                 {/* Cover */}
                 <div
                   className="relative w-full flex-1"
@@ -171,7 +171,8 @@ export default async function EventsPage() {
                     )}
                   </div>
                 </div>
-              </Link>
+                </button>
+              </form>
             )
           })}
         </div>

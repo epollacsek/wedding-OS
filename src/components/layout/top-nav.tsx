@@ -4,11 +4,16 @@ import type { SVGProps } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Bell, ChevronDown, HelpCircle, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { Profile } from '@/types/database'
 
 const ICON_BTN =
   'size-[46px] flex items-center justify-center rounded-full bg-aroos-chrome text-[#1B1B1B] hover:bg-aroos-chrome-hover transition-colors'
 
-export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
+function initials(name: string) {
+  return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
+
+export function TopNav({ collapsed = false, profile }: { collapsed?: boolean; profile?: Profile | null }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -112,11 +117,11 @@ export function TopNav({ collapsed = false }: { collapsed?: boolean }) {
 
         <button className="h-[52px] min-w-[350px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover">
           <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
-            EP
+            {profile ? initials(profile.full_name) : 'EP'}
           </div>
           <div className="min-w-0 flex-1 text-left leading-tight px-1 hidden md:block">
-            <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">Eduardo Pollacsek</p>
-            <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">Aroos | Couple</p>
+            <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{profile?.full_name ?? 'Eduardo Pollacsek'}</p>
+            <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">Aroos | {profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'}</p>
           </div>
           <ChevronDown className="size-6 shrink-0 text-[#1B1B1B]/70" />
         </button>

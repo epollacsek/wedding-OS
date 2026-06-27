@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, Users, Calendar } from 'lucide-react'
+import { Plus, Users, Calendar, ChevronDown } from 'lucide-react'
 
 type MockEvent = {
   id: string
@@ -76,16 +76,20 @@ export default function EventsPage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
-      <header className="flex items-center justify-between px-8 py-6">
+      <header className="flex h-[84px] shrink-0 items-center justify-between px-6">
         <span className="text-[28px] font-bold leading-none tracking-tight text-[#1B1B1B]">
           aroos.
         </span>
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-full bg-aroos-avatar flex items-center justify-center text-sm font-semibold text-[#1B1B1B]">
+        <button className="h-[52px] min-w-[350px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover">
+          <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
             EP
           </div>
-          <span className="text-[15px] font-medium text-[#1B1B1B]">Eduardo Pollacsek</span>
-        </div>
+          <div className="min-w-0 flex-1 text-left leading-tight px-1">
+            <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">Eduardo Pollacsek</p>
+            <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">Aroos | Couple</p>
+          </div>
+          <ChevronDown className="size-6 shrink-0 text-[#1B1B1B]/70" />
+        </button>
       </header>
 
       <section className="flex flex-1 flex-col px-8 pt-4 pb-10">
@@ -97,7 +101,7 @@ export default function EventsPage() {
         </p>
 
         {/* Event cards — evenly split across full width, grow to fill space */}
-        <div className={`mt-[5vh] grid gap-5 ${gridClass(total)}`}>
+        <div className={`mt-10 grid gap-5 flex-1 ${gridClass(total)}`}>
           {MOCK_EVENTS.map(event => {
             const days = event.date ? daysUntil(event.date) : null
             return (
@@ -108,7 +112,7 @@ export default function EventsPage() {
               >
                 {/* Cover */}
                 <div
-                  className="relative w-full h-[52vh]"
+                  className="relative w-full flex-1"
                   style={{ background: event.coverGradient }}
                 >
                   <div className="absolute left-4 top-4">

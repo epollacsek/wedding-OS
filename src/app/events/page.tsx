@@ -93,7 +93,6 @@ export default async function EventsPage() {
           </div>
           <div className="min-w-0 flex-1 text-left leading-tight px-1">
             <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{profile?.full_name ?? 'Eduardo Pollacsek'}</p>
-            <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">Aroos | {profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'}</p>
           </div>
           <ChevronDown className="size-6 shrink-0 text-[#1B1B1B]/70" />
         </button>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
+import { TIMEZONES, searchTimezones, type TzEntry } from '@/lib/timezones'
 
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
@@ -205,49 +206,11 @@ function StepIdentity({ userName }: { userName: string }) {
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
   const [timezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone)
-  const [tzOffset] = useState(() => {
-    const offset = -new Date().getTimezoneOffset()
-    const sign = offset >= 0 ? '+' : '-'
-    const h = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0')
-    const m = (Math.abs(offset) % 60).toString().padStart(2, '0')
-    return `GMT${sign}${h}:${m}`
-  })
-  const [tzOverride, setTzOverride] = useState('')
+  const detectedEntry = TIMEZONES.find(t => t.tz === timezone) ?? TIMEZONES.find(t => t.offsetMinutes === -new Date().getTimezoneOffset()) ?? TIMEZONES[13]
+  const [selectedTz, setSelectedTz] = useState<TzEntry>(detectedEntry)
   const [tzConfirmed, setTzConfirmed] = useState(false)
   const [tzOpen, setTzOpen] = useState(false)
   const [tzSearch, setTzSearch] = useState('')
-  const displayTz = tzOverride || timezone
-
-  const allTimezones = (() => {
-    const zones: string[] = (typeof Intl !== 'undefined' && 'supportedValuesOf' in Intl)
-      ? (Intl as unknown as { supportedValuesOf: (k: string) => string[] }).supportedValuesOf('timeZone')
-      : ['Africa/Abidjan','Africa/Accra','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Africa/Nairobi',
-         'America/Anchorage','America/Bogota','America/Buenos_Aires','America/Chicago','America/Denver',
-         'America/Halifax','America/Lima','America/Los_Angeles','America/Mexico_City','America/New_York',
-         'America/Phoenix','America/Santiago','America/Sao_Paulo','America/Toronto','America/Vancouver',
-         'Asia/Bangkok','Asia/Dubai','Asia/Hong_Kong','Asia/Jakarta','Asia/Karachi','Asia/Kolkata',
-         'Asia/Kuala_Lumpur','Asia/Manila','Asia/Seoul','Asia/Shanghai','Asia/Singapore',
-         'Asia/Taipei','Asia/Tehran','Asia/Tokyo','Atlantic/Azores','Australia/Adelaide',
-         'Australia/Brisbane','Australia/Melbourne','Australia/Perth','Australia/Sydney',
-         'Europe/Amsterdam','Europe/Athens','Europe/Berlin','Europe/Brussels','Europe/Bucharest',
-         'Europe/Copenhagen','Europe/Dublin','Europe/Helsinki','Europe/Istanbul','Europe/Kiev',
-         'Europe/Lisbon','Europe/London','Europe/Madrid','Europe/Moscow','Europe/Oslo',
-         'Europe/Paris','Europe/Prague','Europe/Rome','Europe/Stockholm','Europe/Vienna',
-         'Europe/Warsaw','Europe/Zurich','Pacific/Auckland','Pacific/Fiji','Pacific/Honolulu',
-         'Pacific/Tahiti','UTC']
-
-    return zones.map(tz => {
-      try {
-        const offsetMin = -new Date(new Date().toLocaleString('en-US', { timeZone: tz })).getTimezoneOffset?.() ??
-          (() => { const d = new Date(); const utc = d.getTime() + d.getTimezoneOffset() * 60000; return Math.round((new Date(new Date(utc).toLocaleString('en-US', { timeZone: tz })).getTime() - utc) / 60000) })()
-        const parts = new Intl.DateTimeFormat('en', { timeZone: tz, timeZoneName: 'shortOffset' }).formatToParts(new Date())
-        const offset = parts.find(p => p.type === 'timeZoneName')?.value ?? 'GMT+0'
-        const city = tz.split('/').pop()!.replace(/_/g, ' ')
-        const region = tz.includes('/') ? tz.split('/')[0] : 'Other'
-        return { tz, offset, city, region, offsetMin: 0, label: `${offset} — ${city}`, search: `${tz} ${city} ${offset}`.toLowerCase() }
-      } catch { return null }
-    }).filter(Boolean) as { tz: string; offset: string; city: string; region: string; offsetMin: number; label: string; search: string }[]
-  })()
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -334,49 +297,52 @@ function StepIdentity({ userName }: { userName: string }) {
                 <span className="text-[15px] text-[#1B1B1B]/35">Select a date range on the calendar</span>
               )}
 
-              {/* Timezone */}
-              <div className="relative shrink-0 ml-4">
+              {/* Timezone pill */}
+              <div className="relative shrink-0 ml-3">
                 <button
                   type="button"
                   onClick={() => { setTzOpen(v => !v); setTzSearch('') }}
-                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all ${
+                  className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-all ${
                     tzConfirmed
-                      ? 'border border-[#1B1B1B]/12 bg-white text-[#1B1B1B]/70 hover:border-[#1B1B1B]/25'
-                      : 'border-2 border-aroos-accent/60 bg-aroos-accent/[0.06] text-aroos-accent animate-pulse hover:animate-none'
+                      ? 'bg-[#F0FDF4] text-green-700 border border-green-200'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                   }`}
                 >
-                  🌍
-                  <span>{displayTz.split('/').pop()?.replace(/_/g, ' ')} ({tzOffset})</span>
-                  {!tzConfirmed && <span className="text-[11px] font-semibold text-aroos-accent">· Confirm</span>}
+                  {tzConfirmed ? (
+                    <><Check className="size-3.5 text-green-600" /> {selectedTz.offset} — {selectedTz.label.split('—')[0].trim()}</>
+                  ) : (
+                    <><span className="size-2 rounded-full bg-amber-400 animate-pulse inline-block" /> Confirm timezone</>
+                  )}
                 </button>
 
                 {tzOpen && (
-                  <div className="absolute right-0 top-full mt-2 z-50 w-[320px] rounded-2xl border border-[#1B1B1B]/10 bg-white shadow-[0_12px_40px_rgba(27,27,27,0.16)] overflow-hidden">
+                  <div className="absolute right-0 top-full mt-2 z-50 w-[380px] rounded-2xl border border-[#1B1B1B]/10 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.18)] overflow-hidden">
                     <div className="p-3 border-b border-[#1B1B1B]/08">
+                      <p className="text-[12px] font-semibold text-[#1B1B1B]/40 uppercase tracking-wide mb-2">Select your timezone</p>
                       <input
                         autoFocus
                         type="text"
                         value={tzSearch}
                         onChange={e => setTzSearch(e.target.value)}
-                        placeholder="Search city or timezone…"
+                        placeholder="Search by city — e.g. Rio de Janeiro, London, Dubai…"
                         className="w-full rounded-lg border border-[#1B1B1B]/12 bg-[#FAFAFA] px-3 py-2 text-[14px] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/15"
                       />
                     </div>
-                    <div className="max-h-[240px] overflow-y-auto">
-                      {allTimezones
-                        .filter(t => !tzSearch || t.search.includes(tzSearch.toLowerCase()))
-                        .slice(0, 80)
-                        .map(t => (
-                          <button
-                            key={t.tz}
-                            type="button"
-                            onClick={() => { setTzOverride(t.tz); setTzConfirmed(true); setTzOpen(false) }}
-                            className={`w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F5F3FF] transition-colors ${t.tz === displayTz ? 'bg-aroos-accent/[0.06]' : ''}`}
-                          >
-                            <span className="text-[14px] text-[#1B1B1B]">{t.city.replace(/_/g, ' ')}</span>
-                            <span className="text-[13px] font-mono text-[#1B1B1B]/45 shrink-0 ml-3">{t.offset}</span>
-                          </button>
-                        ))}
+                    <div className="max-h-[260px] overflow-y-auto">
+                      {searchTimezones(tzSearch).map(t => (
+                        <button
+                          key={t.tz}
+                          type="button"
+                          onClick={() => { setSelectedTz(t); setTzConfirmed(true); setTzOpen(false); setTzSearch('') }}
+                          className={`w-full flex items-start justify-between gap-3 px-4 py-3 text-left hover:bg-[#F5F3FF] transition-colors border-b border-[#1B1B1B]/05 last:border-0 ${t.tz === selectedTz.tz ? 'bg-aroos-accent/[0.05]' : ''}`}
+                        >
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-medium text-[#1B1B1B] leading-tight">{t.label}</p>
+                            <p className="text-[12px] text-[#1B1B1B]/40 mt-0.5 truncate">{t.cities.slice(0, 5).join(', ')}</p>
+                          </div>
+                          <span className="text-[13px] font-mono font-semibold text-[#1B1B1B]/50 shrink-0 mt-0.5">{t.offset}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}

@@ -199,7 +199,7 @@ function ConfirmButton({ onClick }: { onClick: () => void }) {
 
 function StepIdentity({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<Phase>('intro')
-  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
 
@@ -261,16 +261,17 @@ function StepIdentity({ userName }: { userName: string }) {
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date below.</MaryBubble>
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden w-fit">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden">
             <Calendar
-              mode="single"
+              mode="range"
               selected={date}
               onSelect={setDate}
               disabled={{ before: new Date() }}
+              numberOfMonths={2}
               className="p-4"
             />
           </div>
-          {date && <ConfirmButton onClick={confirmDate} />}
+          {date?.from && <ConfirmButton onClick={confirmDate} />}
         </>
       )}
 
@@ -278,13 +279,17 @@ function StepIdentity({ userName }: { userName: string }) {
       {show('q1_no') && !show('q1_yes') && <UserReply label="Not yet" />}
 
       {/* After date confirmed */}
-      {show('q1_confirmed') && phase !== 'q1_yes' && date && (
-        <UserReply label={`The date is set — ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`} />
+      {show('q1_confirmed') && phase !== 'q1_yes' && date?.from && (
+        <UserReply label={
+          date.to && date.to.getTime() !== date.from.getTime()
+            ? `${date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} → ${date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+            : date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+        } />
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
       {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
         <MaryBubble>
-          {date ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Do you have a venue in mind?'}
+          {date?.from ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Do you have a venue in mind?'}
         </MaryBubble>
       )}
 
@@ -313,7 +318,7 @@ function StepIdentity({ userName }: { userName: string }) {
 
       {show('q3') && !show('q2_yes') && (
         <MaryBubble>
-          {venue ? 'Perfect, noted! Last one — roughly how many guests are you expecting?' : 'That\'s fine — we\'ll add the venue later. Last one — roughly how many guests are you expecting?'}
+          {venue ? 'Perfect, noted! Last one — roughly how many guests are you expecting?' : "That's fine — we'll add the venue later. Last one — roughly how many guests are you expecting?"}
         </MaryBubble>
       )}
 

@@ -5,10 +5,37 @@ import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 const STEPS = [
-  { label: 'Event basics', sub: 'Name, type, dates and venue' },
+  { label: 'What are we planning?', sub: 'Pick a category to get started' },
   { label: 'Identity', sub: 'How the event looks and feels' },
   { label: 'Your team', sub: 'People who help you manage it' },
   { label: 'Budget & comms', sub: 'Finance baseline and guest communication' },
+]
+
+const EVENT_TYPES = [
+  {
+    value: 'Wedding',
+    emoji: '💍',
+    label: 'Wedding',
+    sub: 'Ceremony, reception and everything in between',
+  },
+  {
+    value: 'Corporate',
+    emoji: '🏢',
+    label: 'Corporate',
+    sub: 'Conferences, retreats, team events and launches',
+  },
+  {
+    value: 'Birthday',
+    emoji: '🎂',
+    label: 'Birthday',
+    sub: 'Milestone celebrations and surprise parties',
+  },
+  {
+    value: 'Social',
+    emoji: '🥂',
+    label: 'Social',
+    sub: 'Dinners, gatherings, anniversaries and more',
+  },
 ]
 
 const INPUT = 'h-11 w-full rounded-lg border border-[#1B1B1B]/15 bg-[#FAFAFA] px-4 text-[15px] text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/30 focus:border-aroos-accent focus:bg-white focus:ring-2 focus:ring-aroos-accent/15 transition-colors'
@@ -27,39 +54,46 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 function StepBasics() {
+  const [selected, setSelected] = useState<string | null>(null)
+
   return (
     <div className="flex flex-col gap-6">
-      <Field label="Event name">
-        <input type="text" placeholder="Eduardo & Ana's Wedding" className={INPUT} />
-      </Field>
-      <Field label="Event type">
-        <select className={INPUT}>
-          <option value="">Select a type</option>
-          <option>Wedding</option>
-          <option>Corporate</option>
-          <option>Birthday</option>
-          <option>Other</option>
-        </select>
-      </Field>
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Ceremony date">
-          <input type="date" className={INPUT} />
-        </Field>
-        <Field label="Reception date" hint="Leave empty if same day">
-          <input type="date" className={INPUT} />
-        </Field>
+        {EVENT_TYPES.map(({ value, emoji, label, sub }) => {
+          const active = selected === value
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setSelected(value)}
+              className={`flex flex-col items-start gap-3 rounded-2xl border-2 p-6 text-left transition-all duration-200 hover:border-aroos-accent/50 hover:bg-aroos-accent/[0.03] ${
+                active
+                  ? 'border-aroos-accent bg-aroos-accent/[0.05]'
+                  : 'border-[#1B1B1B]/10 bg-white'
+              }`}
+            >
+              <span className="text-[32px] leading-none">{emoji}</span>
+              <div>
+                <p className={`text-[17px] font-semibold leading-tight ${active ? 'text-aroos-accent' : 'text-[#1B1B1B]'}`}>{label}</p>
+                <p className="mt-1 text-[13px] leading-snug text-[#1B1B1B]/50">{sub}</p>
+              </div>
+            </button>
+          )
+        })}
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Ceremony venue">
-          <input type="text" placeholder="Church of the Holy Cross" className={INPUT} />
-        </Field>
-        <Field label="Reception venue" hint="Leave empty if same">
-          <input type="text" placeholder="Palácio de Queluz" className={INPUT} />
-        </Field>
-      </div>
-      <Field label="Expected guest count" hint="Your best estimate — you can update this later">
-        <input type="number" min={0} placeholder="180" className={`${INPUT} max-w-[160px]`} />
-      </Field>
+
+      {selected && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <Field label={`What's the name of your ${selected.toLowerCase()}?`}>
+            <input
+              type="text"
+              autoFocus
+              placeholder={selected === 'Wedding' ? "Eduardo & Ana's Wedding" : selected === 'Corporate' ? 'Aroos Company Retreat' : selected === 'Birthday' ? "Ana's 30th" : 'Summer Dinner Party'}
+              className={INPUT}
+            />
+          </Field>
+        </div>
+      )}
     </div>
   )
 }

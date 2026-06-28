@@ -272,14 +272,14 @@ function StepIdentity({ userName }: { userName: string }) {
                   <span className="text-[15px] font-semibold text-[#1B1B1B]">
                     {date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {date.to && date.to.getTime() !== date.from.getTime() && (
-                      <> → {date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</>
+                      <> - {date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</>
                     )}
                   </span>
                   <span className="text-[#1B1B1B]/30">·</span>
                   <span className="text-[15px] text-[#1B1B1B]/60">
                     {(() => {
                       const fmt = (m: number) => { const h = Math.floor(m/60); const min = m%60; const ap = h>=12?'PM':'AM'; return `${h%12||12}:${min.toString().padStart(2,'0')} ${ap}` }
-                      return `${fmt(startMinutes)} → ${fmt(endMinutes)}`
+                      return `${fmt(startMinutes)} - ${fmt(endMinutes)}`
                     })()}
                   </span>
                   <button type="button" onClick={() => setDate(undefined)} className="ml-2 size-5 rounded-full bg-[#1B1B1B]/10 flex items-center justify-center hover:bg-[#1B1B1B]/20 transition-colors">

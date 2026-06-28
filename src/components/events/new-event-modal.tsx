@@ -272,6 +272,7 @@ function StepIdentity({ userName }: { userName: string }) {
                 onSelect={setDate}
                 disabled={{ before: new Date() }}
                 numberOfMonths={2}
+                showOutsideDays={false}
                 className="p-5 w-full"
               />
             </div>

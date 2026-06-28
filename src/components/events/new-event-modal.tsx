@@ -198,20 +198,26 @@ function ConfirmButton({ onClick }: { onClick: () => void }) {
   )
 }
 
-function StepIdentity({ userName }: { userName: string }) {
+type StepIdentityProps = {
+  userName: string
+  selectedTz: TzEntry
+  setSelectedTz: (t: TzEntry) => void
+  tzConfirmed: boolean
+  setTzConfirmed: (v: boolean) => void
+  tzOpen: boolean
+  setTzOpen: (v: boolean) => void
+  tzSearch: string
+  setTzSearch: (v: string) => void
+  onCalendarOpen: () => void
+}
+
+function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen }: StepIdentityProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
-  const [timezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone)
-  const detectedEntry = TIMEZONES.find(t => t.tz === timezone) ?? TIMEZONES.find(t => t.offsetMinutes === -new Date().getTimezoneOffset()) ?? TIMEZONES[13]
-  const [selectedTz, setSelectedTz] = useState<TzEntry>(detectedEntry)
-  const [tzConfirmed, setTzConfirmed] = useState(false)
-  const [tzOpen, setTzOpen] = useState(false)
-  const [tzPopupVisible, setTzPopupVisible] = useState(false)
-  const [tzSearch, setTzSearch] = useState('')
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -219,7 +225,7 @@ function StepIdentity({ userName }: { userName: string }) {
     if (phase === 'intro') setTimeout(() => setPhase('intro2'), 900)
     if (phase === 'intro2') setTimeout(() => setPhase('intro_typing'), 1400)
     if (phase === 'intro_typing') setTimeout(() => setPhase('q1'), 1000)
-    if (phase === 'q1_yes') setTimeout(() => setTzPopupVisible(true), 800)
+    if (phase === 'q1_yes') onCalendarOpen()
   }, [phase])
 
   function after(ms: number, next: Phase) { setTimeout(() => setPhase(next), ms) }
@@ -565,11 +571,24 @@ function StepBudgetComms() {
 export function NewEventModal({ open, onClose, userName = 'there' }: { open: boolean; onClose: () => void; userName?: string }) {
   const [step, setStep] = useState(0)
   const isLast = step === STEPS.length - 1
-  const STEP_CONTENT = [StepBasics, () => <StepIdentity userName={userName} />, StepTeam, StepBudgetComms]
+
+  // Timezone state lives here so popup can escape overflow:hidden
+  const detectedEntry = TIMEZONES.find(t => t.tz === Intl.DateTimeFormat().resolvedOptions().timeZone)
+    ?? TIMEZONES.find(t => t.offsetMinutes === -new Date().getTimezoneOffset())
+    ?? TIMEZONES[13]
+  const [selectedTz, setSelectedTz] = useState<TzEntry>(detectedEntry)
+  const [tzConfirmed, setTzConfirmed] = useState(false)
+  const [tzPopupVisible, setTzPopupVisible] = useState(false)
+  const [tzOpen, setTzOpen] = useState(false)
+  const [tzSearch, setTzSearch] = useState('')
+
+  const STEP_CONTENT = [StepBasics, () => <StepIdentity userName={userName} selectedTz={selectedTz} setSelectedTz={setSelectedTz} tzConfirmed={tzConfirmed} setTzConfirmed={setTzConfirmed} tzOpen={tzOpen} setTzOpen={setTzOpen} tzSearch={tzSearch} setTzSearch={setTzSearch} onCalendarOpen={() => setTimeout(() => setTzPopupVisible(true), 800)} />, StepTeam, StepBudgetComms]
   const StepComponent = STEP_CONTENT[step]
 
   function handleClose() {
     setStep(0)
+    setTzPopupVisible(false)
+    setTzConfirmed(false)
     onClose()
   }
 
@@ -577,6 +596,31 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
     <Dialog open={open} onOpenChange={v => { if (!v) handleClose() }}>
       <DialogContent className="w-[90vw] sm:max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
         <DialogTitle className="sr-only">Create new event</DialogTitle>
+
+        {/* Timezone popup — floats in top-right corner of the modal, above overflow */}
+        {tzPopupVisible && !tzConfirmed && step === 1 && (
+          <div className="absolute top-4 right-4 z-[100] w-[270px] rounded-2xl bg-[#1B1B1B] px-5 py-4 shadow-[0_12px_40px_rgba(0,0,0,0.3)] animate-in fade-in slide-in-from-top-3 duration-300">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-[14px] font-semibold text-white">Confirm your timezone</p>
+              <button type="button" onClick={() => setTzPopupVisible(false)} className="text-white/30 hover:text-white/70 shrink-0">
+                <X className="size-4" />
+              </button>
+            </div>
+            <p className="text-[13px] text-white/55 leading-snug mb-4">
+              We think you're in <span className="text-white font-medium">{selectedTz.cities[0]}</span> ({selectedTz.offset}). Is that right?
+            </p>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => { setTzConfirmed(true); setTzPopupVisible(false) }}
+                className="flex-1 h-8 rounded-lg bg-white text-[13px] font-semibold text-[#1B1B1B] hover:bg-white/90 transition-colors">
+                Yes, confirm
+              </button>
+              <button type="button" onClick={() => { setTzPopupVisible(false); setTzOpen(true); setTzSearch('') }}
+                className="flex-1 h-8 rounded-lg bg-white/12 text-[13px] font-medium text-white hover:bg-white/20 transition-colors">
+                Change
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="flex items-start justify-between px-8 pt-7 pb-5">

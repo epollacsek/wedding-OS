@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
-import { TIMEZONES, searchTimezones, type TzEntry } from '@/lib/timezones'
+import { getAllTimezones, searchTimezones, type TzEntry } from '@/lib/timezones'
 
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
@@ -321,8 +321,8 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
                   }`}
                 >
                   {tzConfirmed
-                    ? <><Check className="size-3 text-green-600" /> {selectedTz.offset} · {selectedTz.cities[0]}</>
-                    : <>{selectedTz.offset} · {selectedTz.cities[0]}</>
+                    ? <><Check className="size-3 text-green-600" /> {selectedTz.offset} · {selectedTz.aliases[0] ?? selectedTz.city}</>
+                    : <>{selectedTz.offset} · {selectedTz.aliases[0] ?? selectedTz.city}</>
                   }
                 </button>
 
@@ -348,8 +348,8 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
                           className={`w-full flex items-start justify-between gap-3 px-4 py-3 text-left hover:bg-[#F5F3FF] transition-colors border-b border-[#1B1B1B]/05 last:border-0 ${t.tz === selectedTz.tz ? 'bg-aroos-accent/[0.05]' : ''}`}
                         >
                           <div className="min-w-0">
-                            <p className="text-[14px] font-medium text-[#1B1B1B] leading-tight">{t.label}</p>
-                            <p className="text-[12px] text-[#1B1B1B]/40 mt-0.5 truncate">{t.cities.slice(0, 5).join(', ')}</p>
+                            <p className="text-[14px] font-medium text-[#1B1B1B] leading-tight">{t.city}</p>
+                            <p className="text-[12px] text-[#1B1B1B]/40 mt-0.5 truncate">{t.aliases.slice(0, 5).join(', ') || t.region}</p>
                           </div>
                           <span className="text-[12px] font-mono font-semibold text-[#1B1B1B]/50 shrink-0 mt-0.5">{t.offset}</span>
                         </button>
@@ -548,9 +548,10 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const isLast = step === STEPS.length - 1
 
   // Timezone state lives here so popup can escape overflow:hidden
-  const detectedEntry = TIMEZONES.find(t => t.tz === Intl.DateTimeFormat().resolvedOptions().timeZone)
-    ?? TIMEZONES.find(t => t.offsetMinutes === -new Date().getTimezoneOffset())
-    ?? TIMEZONES[13]
+  const allTz = getAllTimezones()
+  const detectedEntry = allTz.find(t => t.tz === Intl.DateTimeFormat().resolvedOptions().timeZone)
+    ?? allTz.find(t => t.offsetMinutes === -new Date().getTimezoneOffset())
+    ?? allTz[0]
   const [selectedTz, setSelectedTz] = useState<TzEntry>(detectedEntry)
   const [tzConfirmed, setTzConfirmed] = useState(false)
   const [tzPopupVisible, setTzPopupVisible] = useState(false)
@@ -604,7 +605,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
             <div className="rounded-2xl bg-[#1B1B1B] px-4 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.28)]">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <p className="text-[13px] font-semibold text-white leading-snug">
-                  We think you're in <span className="text-[#CBBDEA]">{selectedTz.cities[0]}</span> ({selectedTz.offset})
+                  We think you're in <span className="text-[#CBBDEA]">{selectedTz.aliases[0] ?? selectedTz.city}</span> ({selectedTz.offset})
                 </p>
                 <button type="button" onClick={() => setTzPopupVisible(false)} className="text-white/30 hover:text-white/60 shrink-0 mt-0.5">
                   <X className="size-3.5" />

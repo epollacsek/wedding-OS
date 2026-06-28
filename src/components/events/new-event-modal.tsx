@@ -234,7 +234,7 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) handleClose() }}>
-      <DialogContent className="w-[90vw] sm:max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden">
+      <DialogContent className="w-[90vw] sm:max-w-[1200px] h-[85vh] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
         <DialogTitle className="sr-only">Create new event</DialogTitle>
 
         {/* Header */}
@@ -261,7 +261,7 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         {/* Body */}
-        <div className="px-8 pb-6 max-h-[66vh] overflow-y-auto">
+        <div className="px-8 pb-6 flex-1 overflow-y-auto">
           <StepComponent />
         </div>
 

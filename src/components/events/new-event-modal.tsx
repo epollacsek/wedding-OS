@@ -278,7 +278,7 @@ function StepIdentity({ userName }: { userName: string }) {
             </div>
 
             {/* Time picker — right panel */}
-            <div className="w-[200px] shrink-0 border-l border-[#1B1B1B]/08 p-6 flex flex-col gap-8 justify-center">
+            <div className="w-[220px] shrink-0 border-l border-[#1B1B1B]/08 p-6 flex flex-col gap-8 justify-center">
               {[
                 { label: 'Starts at', value: startMinutes, onChange: setStartMinutes },
                 { label: 'Ends at', value: endMinutes, onChange: (v: number) => setEndMinutes(Math.max(v, startMinutes + 30)) },

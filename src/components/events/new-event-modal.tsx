@@ -213,8 +213,41 @@ function StepIdentity({ userName }: { userName: string }) {
     return `GMT${sign}${h}:${m}`
   })
   const [tzOverride, setTzOverride] = useState('')
-  const [tzChanging, setTzChanging] = useState(false)
+  const [tzConfirmed, setTzConfirmed] = useState(false)
+  const [tzOpen, setTzOpen] = useState(false)
+  const [tzSearch, setTzSearch] = useState('')
   const displayTz = tzOverride || timezone
+
+  const allTimezones = (() => {
+    const zones: string[] = (typeof Intl !== 'undefined' && 'supportedValuesOf' in Intl)
+      ? (Intl as unknown as { supportedValuesOf: (k: string) => string[] }).supportedValuesOf('timeZone')
+      : ['Africa/Abidjan','Africa/Accra','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Africa/Nairobi',
+         'America/Anchorage','America/Bogota','America/Buenos_Aires','America/Chicago','America/Denver',
+         'America/Halifax','America/Lima','America/Los_Angeles','America/Mexico_City','America/New_York',
+         'America/Phoenix','America/Santiago','America/Sao_Paulo','America/Toronto','America/Vancouver',
+         'Asia/Bangkok','Asia/Dubai','Asia/Hong_Kong','Asia/Jakarta','Asia/Karachi','Asia/Kolkata',
+         'Asia/Kuala_Lumpur','Asia/Manila','Asia/Seoul','Asia/Shanghai','Asia/Singapore',
+         'Asia/Taipei','Asia/Tehran','Asia/Tokyo','Atlantic/Azores','Australia/Adelaide',
+         'Australia/Brisbane','Australia/Melbourne','Australia/Perth','Australia/Sydney',
+         'Europe/Amsterdam','Europe/Athens','Europe/Berlin','Europe/Brussels','Europe/Bucharest',
+         'Europe/Copenhagen','Europe/Dublin','Europe/Helsinki','Europe/Istanbul','Europe/Kiev',
+         'Europe/Lisbon','Europe/London','Europe/Madrid','Europe/Moscow','Europe/Oslo',
+         'Europe/Paris','Europe/Prague','Europe/Rome','Europe/Stockholm','Europe/Vienna',
+         'Europe/Warsaw','Europe/Zurich','Pacific/Auckland','Pacific/Fiji','Pacific/Honolulu',
+         'Pacific/Tahiti','UTC']
+
+    return zones.map(tz => {
+      try {
+        const offsetMin = -new Date(new Date().toLocaleString('en-US', { timeZone: tz })).getTimezoneOffset?.() ??
+          (() => { const d = new Date(); const utc = d.getTime() + d.getTimezoneOffset() * 60000; return Math.round((new Date(new Date(utc).toLocaleString('en-US', { timeZone: tz })).getTime() - utc) / 60000) })()
+        const parts = new Intl.DateTimeFormat('en', { timeZone: tz, timeZoneName: 'shortOffset' }).formatToParts(new Date())
+        const offset = parts.find(p => p.type === 'timeZoneName')?.value ?? 'GMT+0'
+        const city = tz.split('/').pop()!.replace(/_/g, ' ')
+        const region = tz.includes('/') ? tz.split('/')[0] : 'Other'
+        return { tz, offset, city, region, offsetMin: 0, label: `${offset} — ${city}`, search: `${tz} ${city} ${offset}`.toLowerCase() }
+      } catch { return null }
+    }).filter(Boolean) as { tz: string; offset: string; city: string; region: string; offsetMin: number; label: string; search: string }[]
+  })()
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -302,27 +335,50 @@ function StepIdentity({ userName }: { userName: string }) {
               )}
 
               {/* Timezone */}
-              <div className="flex items-center gap-2 shrink-0 ml-4">
-                {tzChanging ? (
-                  <select
-                    autoFocus
-                    value={displayTz}
-                    onChange={e => { setTzOverride(e.target.value); setTzChanging(false) }}
-                    onBlur={() => setTzChanging(false)}
-                    className="text-[13px] rounded-lg border border-[#1B1B1B]/15 bg-white px-2 py-1 outline-none focus:border-aroos-accent"
-                  >
-                    {[
-                      'Europe/Lisbon','Europe/London','Europe/Paris','Europe/Berlin','Europe/Madrid','Europe/Rome',
-                      'America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Sao_Paulo',
-                      'Asia/Dubai','Asia/Kolkata','Asia/Singapore','Asia/Tokyo','Asia/Shanghai',
-                      'Australia/Sydney','Pacific/Auckland',
-                    ].map(tz => <option key={tz} value={tz}>{tz}</option>)}
-                  </select>
-                ) : (
-                  <button type="button" onClick={() => setTzChanging(true)}
-                    className="flex items-center gap-1.5 rounded-full border border-[#1B1B1B]/10 bg-white px-3 py-1 text-[13px] text-[#1B1B1B]/60 hover:border-[#1B1B1B]/20 hover:text-[#1B1B1B] transition-colors">
-                    🌍 {displayTz.split('/')[1]?.replace('_', ' ') ?? displayTz} · {tzOffset}
-                  </button>
+              <div className="relative shrink-0 ml-4">
+                <button
+                  type="button"
+                  onClick={() => { setTzOpen(v => !v); setTzSearch('') }}
+                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all ${
+                    tzConfirmed
+                      ? 'border border-[#1B1B1B]/12 bg-white text-[#1B1B1B]/70 hover:border-[#1B1B1B]/25'
+                      : 'border-2 border-aroos-accent/60 bg-aroos-accent/[0.06] text-aroos-accent animate-pulse hover:animate-none'
+                  }`}
+                >
+                  🌍
+                  <span>{displayTz.split('/').pop()?.replace(/_/g, ' ')} ({tzOffset})</span>
+                  {!tzConfirmed && <span className="text-[11px] font-semibold text-aroos-accent">· Confirm</span>}
+                </button>
+
+                {tzOpen && (
+                  <div className="absolute right-0 top-full mt-2 z-50 w-[320px] rounded-2xl border border-[#1B1B1B]/10 bg-white shadow-[0_12px_40px_rgba(27,27,27,0.16)] overflow-hidden">
+                    <div className="p-3 border-b border-[#1B1B1B]/08">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={tzSearch}
+                        onChange={e => setTzSearch(e.target.value)}
+                        placeholder="Search city or timezone…"
+                        className="w-full rounded-lg border border-[#1B1B1B]/12 bg-[#FAFAFA] px-3 py-2 text-[14px] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/15"
+                      />
+                    </div>
+                    <div className="max-h-[240px] overflow-y-auto">
+                      {allTimezones
+                        .filter(t => !tzSearch || t.search.includes(tzSearch.toLowerCase()))
+                        .slice(0, 80)
+                        .map(t => (
+                          <button
+                            key={t.tz}
+                            type="button"
+                            onClick={() => { setTzOverride(t.tz); setTzConfirmed(true); setTzOpen(false) }}
+                            className={`w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F5F3FF] transition-colors ${t.tz === displayTz ? 'bg-aroos-accent/[0.06]' : ''}`}
+                          >
+                            <span className="text-[14px] text-[#1B1B1B]">{t.city.replace(/_/g, ' ')}</span>
+                            <span className="text-[13px] font-mono text-[#1B1B1B]/45 shrink-0 ml-3">{t.offset}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

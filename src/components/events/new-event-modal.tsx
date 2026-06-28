@@ -84,7 +84,7 @@ function StepBasics() {
 
       {selected && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <Field label={`What's the name of your ${selected.toLowerCase()}?`}>
+          <Field label="How should we call your event?">
             <input
               type="text"
               autoFocus

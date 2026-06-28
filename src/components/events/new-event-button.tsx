@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { NewEventModal } from './new-event-modal'
 
-export function NewEventButton() {
+export function NewEventButton({ userName }: { userName: string }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -22,7 +22,7 @@ export function NewEventButton() {
         </span>
       </button>
 
-      <NewEventModal open={open} onClose={() => setOpen(false)} />
+      <NewEventModal open={open} onClose={() => setOpen(false)} userName={userName} />
     </>
   )
 }

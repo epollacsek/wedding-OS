@@ -177,7 +177,7 @@ export default async function EventsPage() {
           })}
         </div>
 
-        <NewEventButton />
+        <NewEventButton userName={profile?.full_name?.split(' ')[0] ?? 'there'} />
       </section>
     </main>
   )

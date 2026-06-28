@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 const STEPS = [
@@ -14,27 +14,35 @@ const STEPS = [
 const EVENT_TYPES = [
   {
     value: 'Wedding',
-    emoji: '💍',
+    icon: Heart,
     label: 'Wedding',
     sub: 'Ceremony, reception and everything in between',
+    accent: '#CBBDEA',
+    iconColor: '#7C67C8',
   },
   {
     value: 'Corporate',
-    emoji: '🏢',
+    icon: Briefcase,
     label: 'Corporate',
-    sub: 'Conferences, retreats, team events and launches',
+    sub: 'Conferences, retreats and company events',
+    accent: '#A9C2C8',
+    iconColor: '#0E4A83',
   },
   {
     value: 'Birthday',
-    emoji: '🎂',
+    icon: Gift,
     label: 'Birthday',
     sub: 'Milestone celebrations and surprise parties',
+    accent: '#FFD6A5',
+    iconColor: '#C47A2A',
   },
   {
     value: 'Social',
-    emoji: '🥂',
+    icon: Users,
     label: 'Social',
-    sub: 'Dinners, gatherings, anniversaries and more',
+    sub: 'Dinners, gatherings and private occasions',
+    accent: '#B5EAD7',
+    iconColor: '#1A7A55',
   },
 ]
 
@@ -59,23 +67,33 @@ function StepBasics() {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-4 gap-4">
-        {EVENT_TYPES.map(({ value, emoji, label, sub }) => {
+        {EVENT_TYPES.map(({ value, icon: Icon, label, sub, accent, iconColor }) => {
           const active = selected === value
           return (
             <button
               key={value}
               type="button"
               onClick={() => setSelected(value)}
-              className={`flex flex-col items-start gap-3 rounded-2xl border-2 p-6 text-left transition-all duration-200 hover:border-aroos-accent/50 hover:bg-aroos-accent/[0.03] ${
+              className={`relative flex flex-col items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-200 ${
                 active
-                  ? 'border-aroos-accent bg-aroos-accent/[0.05]'
-                  : 'border-[#1B1B1B]/10 bg-white'
+                  ? 'border-[#1B1B1B]/20 bg-white shadow-[0_4px_20px_rgba(27,27,27,0.10)]'
+                  : 'border-[#1B1B1B]/08 bg-white hover:border-[#1B1B1B]/15 hover:shadow-[0_2px_12px_rgba(27,27,27,0.06)]'
               }`}
             >
-              <span className="text-[32px] leading-none">{emoji}</span>
+              {active && (
+                <div className="absolute top-3 right-3 size-5 rounded-full bg-[#1B1B1B] flex items-center justify-center">
+                  <Check className="size-3 text-white" />
+                </div>
+              )}
+              <div
+                className="size-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: accent }}
+              >
+                <Icon className="size-5" style={{ color: iconColor }} />
+              </div>
               <div>
-                <p className={`text-[17px] font-semibold leading-tight ${active ? 'text-aroos-accent' : 'text-[#1B1B1B]'}`}>{label}</p>
-                <p className="mt-1 text-[13px] leading-snug text-[#1B1B1B]/50">{sub}</p>
+                <p className="text-[15px] font-semibold text-[#1B1B1B]">{label}</p>
+                <p className="mt-1 text-[12px] leading-snug text-[#1B1B1B]/45">{sub}</p>
               </div>
             </button>
           )

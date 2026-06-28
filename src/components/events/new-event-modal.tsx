@@ -261,7 +261,7 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         {/* Body */}
-        <div className="px-8 pb-6 min-h-[60vh] overflow-y-auto">
+        <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
           <StepComponent />
         </div>
 

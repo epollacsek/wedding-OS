@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Calendar } from '@/components/ui/calendar'
 
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
@@ -198,7 +199,7 @@ function ConfirmButton({ onClick }: { onClick: () => void }) {
 
 function StepIdentity({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<Phase>('intro')
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState<Date | undefined>(undefined)
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
 
@@ -255,8 +256,14 @@ function StepIdentity({ userName }: { userName: string }) {
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date below.</MaryBubble>
-          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} />
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden w-fit">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              disabled={{ before: new Date() }}
+              className="p-4"
+            />
           </div>
           {date && <ConfirmButton onClick={confirmDate} />}
         </>
@@ -266,15 +273,13 @@ function StepIdentity({ userName }: { userName: string }) {
       {show('q1_no') && !show('q1_yes') && <UserReply label="Not yet" />}
 
       {/* After date confirmed */}
-      {show('q1_confirmed') && phase !== 'q1_yes' && (
-        <>
-          {date ? <UserReply label={`The date is set — ${new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`} /> : null}
-        </>
+      {show('q1_confirmed') && phase !== 'q1_yes' && date && (
+        <UserReply label={`The date is set — ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`} />
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
       {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
         <MaryBubble>
-          {date ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date any time in Settings. Do you have a venue in mind?'}
+          {date ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Do you have a venue in mind?'}
         </MaryBubble>
       )}
 

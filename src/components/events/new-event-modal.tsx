@@ -200,6 +200,8 @@ function ConfirmButton({ onClick }: { onClick: () => void }) {
 function StepIdentity({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
+  const [startMinutes, setStartMinutes] = useState(600)  // 10:00
+  const [endMinutes, setEndMinutes] = useState(1320)     // 22:00
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
 
@@ -256,20 +258,52 @@ function StepIdentity({ userName }: { userName: string }) {
         />
       )}
 
-      {/* Yes path — date picker + confirm */}
+      {/* Yes path — date + time picker */}
       {show('q1_yes') && !show('q1_confirmed') && (
         <>
           <UserReply label="Yes, we have a date!" />
-          <MaryBubble>Wonderful! Pick the date below.</MaryBubble>
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden">
-            <Calendar
-              mode="range"
-              selected={date}
-              onSelect={setDate}
-              disabled={{ before: new Date() }}
-              numberOfMonths={2}
-              className="p-4"
-            />
+          <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden flex">
+            {/* Calendar — takes most of the space */}
+            <div className="flex-1 min-w-0">
+              <Calendar
+                mode="range"
+                selected={date}
+                onSelect={setDate}
+                disabled={{ before: new Date() }}
+                numberOfMonths={2}
+                className="p-5 w-full"
+              />
+            </div>
+
+            {/* Time picker — right panel */}
+            <div className="w-[200px] shrink-0 border-l border-[#1B1B1B]/08 p-6 flex flex-col gap-8 justify-center">
+              {[
+                { label: 'Starts at', value: startMinutes, onChange: setStartMinutes },
+                { label: 'Ends at', value: endMinutes, onChange: (v: number) => setEndMinutes(Math.max(v, startMinutes + 30)) },
+              ].map(({ label, value, onChange }) => {
+                const h = Math.floor(value / 60)
+                const m = value % 60
+                const ampm = h >= 12 ? 'PM' : 'AM'
+                const h12 = h % 12 === 0 ? 12 : h % 12
+                const formatted = `${h12}:${m.toString().padStart(2, '0')} ${ampm}`
+                return (
+                  <div key={label} className="flex flex-col gap-3">
+                    <p className="text-[13px] font-semibold text-[#1B1B1B]/50 uppercase tracking-wide">{label}</p>
+                    <p className="text-[28px] font-bold text-[#1B1B1B] leading-none">{formatted}</p>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1425}
+                      step={15}
+                      value={value}
+                      onChange={e => onChange(Number(e.target.value))}
+                      className="w-full accent-aroos-accent cursor-pointer"
+                    />
+                  </div>
+                )
+              })}
+            </div>
           </div>
           {date?.from && <ConfirmButton onClick={confirmDate} />}
         </>

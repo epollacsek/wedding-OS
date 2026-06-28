@@ -212,8 +212,9 @@ function StepIdentity({ userName }: { userName: string }) {
     const m = (Math.abs(offset) % 60).toString().padStart(2, '0')
     return `GMT${sign}${h}:${m}`
   })
-  const [tzConfirmed, setTzConfirmed] = useState(false)
-  const [tzDismissed, setTzDismissed] = useState(false)
+  const [tzOverride, setTzOverride] = useState('')
+  const [tzChanging, setTzChanging] = useState(false)
+  const displayTz = tzOverride || timezone
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -273,40 +274,7 @@ function StepIdentity({ userName }: { userName: string }) {
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden relative">
-
-            {/* Timezone popup */}
-            {!tzConfirmed && !tzDismissed && (
-              <div className="absolute top-14 right-4 z-10 w-[220px] rounded-xl border border-[#1B1B1B]/10 bg-white shadow-[0_8px_24px_rgba(27,27,27,0.12)] p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-[13px] font-semibold text-[#1B1B1B]">Confirm your timezone</p>
-                  <button type="button" onClick={() => setTzDismissed(true)} className="text-[#1B1B1B]/30 hover:text-[#1B1B1B]/60 transition-colors shrink-0">
-                    <X className="size-3.5" />
-                  </button>
-                </div>
-                <p className="text-[12px] text-[#1B1B1B]/55 leading-snug mb-3">
-                  We detected <span className="font-semibold text-[#1B1B1B]">{timezone}</span> ({tzOffset}). Is that right?
-                </p>
-                <div className="flex gap-2">
-                  <button type="button" onClick={() => setTzConfirmed(true)}
-                    className="flex-1 h-8 rounded-lg bg-[#1B1B1B] text-[12px] font-semibold text-white hover:bg-[#333] transition-colors">
-                    Yes, that's me
-                  </button>
-                  <button type="button" onClick={() => setTzDismissed(true)}
-                    className="flex-1 h-8 rounded-lg border border-[#1B1B1B]/12 text-[12px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
-                    Change
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Confirmed badge */}
-            {tzConfirmed && (
-              <div className="absolute top-14 right-4 z-10 flex items-center gap-1.5 rounded-full bg-[#E8F5E9] px-3 py-1.5 animate-in fade-in duration-300">
-                <div className="size-2 rounded-full bg-green-500" />
-                <p className="text-[12px] font-medium text-green-700">{timezone} · {tzOffset}</p>
-              </div>
-            )}
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden">
 
             {/* Summary bar */}
             <div className="flex items-center justify-between border-b border-[#1B1B1B]/08 bg-[#FAFAFA] px-5 py-3">
@@ -332,6 +300,31 @@ function StepIdentity({ userName }: { userName: string }) {
               ) : (
                 <span className="text-[15px] text-[#1B1B1B]/35">Select a date range on the calendar</span>
               )}
+
+              {/* Timezone */}
+              <div className="flex items-center gap-2 shrink-0 ml-4">
+                {tzChanging ? (
+                  <select
+                    autoFocus
+                    value={displayTz}
+                    onChange={e => { setTzOverride(e.target.value); setTzChanging(false) }}
+                    onBlur={() => setTzChanging(false)}
+                    className="text-[13px] rounded-lg border border-[#1B1B1B]/15 bg-white px-2 py-1 outline-none focus:border-aroos-accent"
+                  >
+                    {[
+                      'Europe/Lisbon','Europe/London','Europe/Paris','Europe/Berlin','Europe/Madrid','Europe/Rome',
+                      'America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Sao_Paulo',
+                      'Asia/Dubai','Asia/Kolkata','Asia/Singapore','Asia/Tokyo','Asia/Shanghai',
+                      'Australia/Sydney','Pacific/Auckland',
+                    ].map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                  </select>
+                ) : (
+                  <button type="button" onClick={() => setTzChanging(true)}
+                    className="flex items-center gap-1.5 rounded-full border border-[#1B1B1B]/10 bg-white px-3 py-1 text-[13px] text-[#1B1B1B]/60 hover:border-[#1B1B1B]/20 hover:text-[#1B1B1B] transition-colors">
+                    🌍 {displayTz.split('/')[1]?.replace('_', ' ') ?? displayTz} · {tzOffset}
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="flex">

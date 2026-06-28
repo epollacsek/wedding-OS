@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 const STEPS = [
@@ -225,13 +225,6 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
             <h2 className="text-[26px] font-bold leading-tight text-[#1B1B1B]">{STEPS[step].label}</h2>
             <p className="text-[14px] text-[#1B1B1B]/50 mt-1">{STEPS[step].sub}</p>
           </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-[#1B1B1B]/[0.06] transition-colors text-[#1B1B1B]/40 mt-1 shrink-0"
-          >
-            <X className="size-4" />
-          </button>
         </div>
 
         {/* Progress dots */}

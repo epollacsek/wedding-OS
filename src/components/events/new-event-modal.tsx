@@ -8,7 +8,7 @@ import { TIMEZONES, searchTimezones, type TzEntry } from '@/lib/timezones'
 
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
-  { label: 'Meet Mary', sub: 'Your AI event organiser — she\'ll guide you through the setup' },
+  { label: 'Meet Mary', sub: 'Your AI event organizer - she\'ll guide you through the setup' },
   { label: 'Your team', sub: 'People who help you manage it' },
   { label: 'Budget & comms', sub: 'Finance baseline and guest communication' },
 ]
@@ -260,12 +260,12 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       <style>{`@keyframes maryBounce { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-6px);opacity:1} }`}</style>
 
       {/* Intro */}
-      {show('intro') && <MaryBubble>Hi{firstName}! 👋 I'm Mary, your personal event organiser.</MaryBubble>}
+      {show('intro') && <MaryBubble>Hi{firstName}! 👋 I'm Mary, your personal event organizer.</MaryBubble>}
       {show('intro2') && <MaryBubble>I'll ask you a few quick questions to get your event set up. It'll only take a minute.</MaryBubble>}
       {phase === 'intro_typing' && <TypingIndicator />}
 
       {/* Q1 — Date */}
-      {show('q1') && <MaryBubble>First — do you already have a date set for your event?</MaryBubble>}
+      {show('q1') && <MaryBubble>First, do you already have a date set for your event?</MaryBubble>}
       {isPhase('q1') && (
         <YesNo
           onYes={() => setPhase('q1_yes')}
@@ -420,7 +420,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {isPhase('q1_typing') && <TypingIndicator />}
       {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
         <MaryBubble>
-          {date?.from ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Do you have a venue in mind?'}
+          {date?.from ? 'Got it, noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Now, do you have a venue in mind?'}
         </MaryBubble>
       )}
 
@@ -435,7 +435,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {show('q2_yes') && !show('q2_confirmed') && (
         <>
           <UserReply label="Yes, we have a venue!" />
-          <MaryBubble>Lovely — what's it called or where is it?</MaryBubble>
+          <MaryBubble>Lovely, what's it called or where is it?</MaryBubble>
           <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <input type="text" value={venue} onChange={e => setVenue(e.target.value)} placeholder="e.g. Palácio de Queluz, Sintra" className={INPUT} />
           </div>
@@ -449,7 +449,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
 
       {show('q3') && !show('q2_yes') && (
         <MaryBubble>
-          {venue ? 'Perfect, noted! Last one — roughly how many guests are you expecting?' : "That's fine — we'll add the venue later. Last one — roughly how many guests are you expecting?"}
+          {venue ? 'Perfect, noted! Last one, roughly how many guests are you expecting?' : "That's fine — we'll add the venue later. Last one, roughly how many guests are you expecting?"}
         </MaryBubble>
       )}
 
@@ -555,8 +555,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const [tzOpen, setTzOpen] = useState(false)
   const [tzSearch, setTzSearch] = useState('')
 
-  const STEP_CONTENT = [StepBasics, () => <StepIdentity userName={userName} selectedTz={selectedTz} setSelectedTz={setSelectedTz} tzConfirmed={tzConfirmed} setTzConfirmed={setTzConfirmed} tzOpen={tzOpen} setTzOpen={setTzOpen} tzSearch={tzSearch} setTzSearch={setTzSearch} onCalendarOpen={() => setTimeout(() => setTzPopupVisible(true), 800)} />, StepTeam, StepBudgetComms]
-  const StepComponent = STEP_CONTENT[step]
+  const tzProps = { selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen: () => setTimeout(() => setTzPopupVisible(true), 800) }
 
   function handleClose() {
     setStep(0)
@@ -620,7 +619,10 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
 
         {/* Body */}
         <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
-          <StepComponent />
+          {step === 0 && <StepBasics />}
+          {step === 1 && <StepIdentity userName={userName} {...tzProps} />}
+          {step === 2 && <StepTeam />}
+          {step === 3 && <StepBudgetComms />}
         </div>
 
         {/* Footer */}

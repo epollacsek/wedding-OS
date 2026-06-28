@@ -209,9 +209,10 @@ type StepIdentityProps = {
   tzSearch: string
   setTzSearch: (v: string) => void
   onCalendarOpen: () => void
+  pillRef: React.RefObject<HTMLButtonElement>
 }
 
-function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen }: StepIdentityProps) {
+function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen, pillRef }: StepIdentityProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
@@ -310,8 +311,9 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
 
                 {/* Pill */}
                 <button
+                  ref={pillRef}
                   type="button"
-                  onClick={() => { setTzOpen(v => !v); setTzPopupVisible(false); setTzSearch('') }}
+                  onClick={() => { setTzOpen(v => !v); setTzSearch('') }}
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all ${
                     tzConfirmed
                       ? 'bg-[#F0FDF4] text-green-700 border border-green-200'
@@ -554,8 +556,22 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const [tzPopupVisible, setTzPopupVisible] = useState(false)
   const [tzOpen, setTzOpen] = useState(false)
   const [tzSearch, setTzSearch] = useState('')
+  const [pillPos, setPillPos] = useState<{ top: number; right: number } | null>(null)
+  const pillRef = useRef<HTMLButtonElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
-  const tzProps = { selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen: () => setTimeout(() => setTzPopupVisible(true), 800) }
+  const tzProps = {
+    selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed,
+    tzOpen, setTzOpen, tzSearch, setTzSearch, pillRef,
+    onCalendarOpen: () => setTimeout(() => {
+      if (pillRef.current && modalRef.current) {
+        const pill = pillRef.current.getBoundingClientRect()
+        const modal = modalRef.current.getBoundingClientRect()
+        setPillPos({ top: pill.bottom - modal.top + 8, right: modal.right - pill.right })
+      }
+      setTzPopupVisible(true)
+    }, 800)
+  }
 
   function handleClose() {
     setStep(0)
@@ -566,12 +582,15 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) handleClose() }}>
-      <DialogContent className="w-[90vw] sm:max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
+      <DialogContent ref={modalRef} className="w-[90vw] sm:max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
         <DialogTitle className="sr-only">Create new event</DialogTitle>
 
-        {/* Timezone callout — slides up from the timezone pill */}
-        {tzPopupVisible && !tzConfirmed && step === 1 && (
-          <div className="absolute bottom-[72px] right-6 z-[100] w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-400">
+        {/* Timezone callout — anchored just below the pill */}
+        {tzPopupVisible && !tzConfirmed && step === 1 && pillPos && (
+          <div className="absolute z-[100] w-[260px] animate-in fade-in slide-in-from-top-2 duration-300"
+            style={{ top: pillPos.top, right: pillPos.right }}>
+            {/* Arrow pointing UP toward the pill */}
+            <div className="absolute top-[-6px] right-6 size-3 bg-[#1B1B1B] rotate-45 rounded-sm" />
             <div className="rounded-2xl bg-[#1B1B1B] px-4 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.28)]">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <p className="text-[13px] font-semibold text-white leading-snug">
@@ -581,7 +600,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
                   <X className="size-3.5" />
                 </button>
               </div>
-              <p className="text-[12px] text-white/45 mb-3">Tap below to confirm or change.</p>
+              <p className="text-[12px] text-white/45 mb-3">Confirm or change below.</p>
               <div className="flex gap-2">
                 <button type="button" onClick={() => { setTzConfirmed(true); setTzPopupVisible(false) }}
                   className="flex-1 h-7 rounded-lg bg-white text-[12px] font-semibold text-[#1B1B1B] hover:bg-white/90 transition-colors">
@@ -593,8 +612,6 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
                 </button>
               </div>
             </div>
-            {/* Arrow tail pointing down toward the pill */}
-            <div className="absolute bottom-[-6px] right-8 size-3 bg-[#1B1B1B] rotate-45 rounded-sm" />
           </div>
         )}
 

@@ -177,101 +177,149 @@ function YesNo({ onYes, onNo, yesLabel = 'Yes', noLabel = 'Not yet' }: {
   )
 }
 
-type Phase = 'intro' | 'intro2' | 'intro3_typing' | 'q1' | 'q1_replied' | 'q1_typing' | 'q2' | 'q2_date' | 'q2_replied' | 'q2_typing' | 'q3' | 'q3_venue' | 'q3_replied' | 'q3_typing' | 'q4'
+type Phase =
+  | 'intro' | 'intro2' | 'intro_typing' | 'q1'
+  | 'q1_yes' | 'q1_no'
+  | 'q1_confirmed' | 'q1_typing' | 'q2'
+  | 'q2_yes' | 'q2_no'
+  | 'q2_confirmed' | 'q2_typing' | 'q3'
+  | 'q3_answered'
+
+function ConfirmButton({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="flex justify-end animate-in fade-in duration-300">
+      <button type="button" onClick={onClick}
+        className="h-11 rounded-full bg-[#1B1B1B] px-7 text-[16px] font-semibold text-white hover:bg-[#333] transition-colors">
+        Confirm →
+      </button>
+    </div>
+  )
+}
 
 function StepIdentity({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<Phase>('intro')
-  const [dateReply, setDateReply] = useState('')
-  const [venueReply, setVenueReply] = useState('')
+  const [date, setDate] = useState('')
+  const [venue, setVenue] = useState('')
+  const [guests, setGuests] = useState('')
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
   useEffect(() => {
     if (phase === 'intro') setTimeout(() => setPhase('intro2'), 900)
-    if (phase === 'intro2') setTimeout(() => setPhase('intro3_typing'), 1400)
-    if (phase === 'intro3_typing') setTimeout(() => setPhase('q1'), 1000)
+    if (phase === 'intro2') setTimeout(() => setPhase('intro_typing'), 1400)
+    if (phase === 'intro_typing') setTimeout(() => setPhase('q1'), 1000)
   }, [phase])
 
   function after(ms: number, next: Phase) { setTimeout(() => setPhase(next), ms) }
 
-  function handleDate(answer: 'yes' | 'no') {
-    setDateReply(answer === 'yes' ? 'Yes, we have a date!' : 'Not yet')
-    setPhase('q1_replied')
-    after(800, 'q1_typing')
-    after(1700, answer === 'yes' ? 'q2_date' : 'q2')
+  function confirmDate() {
+    setPhase('q1_confirmed')
+    after(700, 'q1_typing')
+    after(1600, 'q2')
   }
 
-  function handleVenue(answer: 'yes' | 'no') {
-    setVenueReply(answer === 'yes' ? 'Yes, we have a venue!' : 'Not yet')
-    setPhase('q2_replied')
-    after(800, 'q2_typing')
-    after(1700, answer === 'yes' ? 'q3_venue' : 'q3')
+  function confirmVenue() {
+    setPhase('q2_confirmed')
+    after(700, 'q2_typing')
+    after(1600, 'q3')
   }
 
-  const order: Phase[] = ['intro','intro2','intro3_typing','q1','q1_replied','q1_typing','q2','q2_date','q2_replied','q2_typing','q3','q3_venue','q3_replied','q3_typing','q4']
+  const order: Phase[] = [
+    'intro','intro2','intro_typing','q1',
+    'q1_yes','q1_no','q1_confirmed','q1_typing','q2',
+    'q2_yes','q2_no','q2_confirmed','q2_typing','q3','q3_answered'
+  ]
   const show = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
+  const isPhase = (...ps: Phase[]) => ps.includes(phase)
 
   return (
-    <div className="flex flex-col gap-5 py-2 px-2 rounded-2xl" style={{ background: 'linear-gradient(180deg, #FAF9FF 0%, #F5F3FF 100%)' }}>
+    <div className="flex flex-col gap-5 p-4 rounded-2xl" style={{ background: 'linear-gradient(180deg, #FAF9FF 0%, #F5F3FF 100%)' }}>
       <style>{`@keyframes maryBounce { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-6px);opacity:1} }`}</style>
 
       {/* Intro */}
       {show('intro') && <MaryBubble>Hi{firstName}! 👋 I'm Mary, your personal event organiser.</MaryBubble>}
-      {show('intro2') && <MaryBubble>I'll ask you a few quick questions so we can get your event set up properly. It'll only take a minute.</MaryBubble>}
-      {phase === 'intro3_typing' && <TypingIndicator />}
+      {show('intro2') && <MaryBubble>I'll ask you a few quick questions to get your event set up. It'll only take a minute.</MaryBubble>}
+      {phase === 'intro_typing' && <TypingIndicator />}
 
       {/* Q1 — Date */}
       {show('q1') && <MaryBubble>First — do you already have a date set for your event?</MaryBubble>}
-      {phase === 'q1' && <YesNo onYes={() => handleDate('yes')} onNo={() => handleDate('no')} />}
+      {isPhase('q1') && (
+        <YesNo
+          onYes={() => setPhase('q1_yes')}
+          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
+        />
+      )}
 
-      {dateReply && <UserReply label={dateReply} />}
-      {phase === 'q1_typing' && <TypingIndicator />}
-
-      {show('q2_date') && <MaryBubble>Wonderful! When is the big day?</MaryBubble>}
-      {show('q2') && dateReply === 'Not yet' && <MaryBubble>No worries at all — you can add the date any time in Settings.</MaryBubble>}
-
-      {show('q2_date') && (
-        <div className="flex gap-4 ml-13 animate-in fade-in slide-in-from-bottom-2 duration-400">
-          <div className="flex flex-col gap-2 flex-1">
-            <label className="text-[14px] font-semibold text-[#1B1B1B]/55">Ceremony date</label>
-            <input type="date" className={INPUT} />
+      {/* Yes path — date picker + confirm */}
+      {show('q1_yes') && !show('q1_confirmed') && (
+        <>
+          <UserReply label="Yes, we have a date!" />
+          <MaryBubble>Wonderful! Pick the date below.</MaryBubble>
+          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} />
           </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <label className="text-[14px] font-semibold text-[#1B1B1B]/55">Reception date <span className="font-normal text-[#1B1B1B]/30">(if different)</span></label>
-            <input type="date" className={INPUT} />
-          </div>
-        </div>
+          {date && <ConfirmButton onClick={confirmDate} />}
+        </>
+      )}
+
+      {/* No path */}
+      {show('q1_no') && !show('q1_yes') && <UserReply label="Not yet" />}
+
+      {/* After date confirmed */}
+      {show('q1_confirmed') && phase !== 'q1_yes' && (
+        <>
+          {date ? <UserReply label={`The date is set — ${new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`} /> : null}
+        </>
+      )}
+      {isPhase('q1_typing') && <TypingIndicator />}
+      {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
+        <MaryBubble>
+          {date ? 'Got it — noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date any time in Settings. Do you have a venue in mind?'}
+        </MaryBubble>
       )}
 
       {/* Q2 — Venue */}
-      {show('q2') && <MaryBubble>Now — do you have a venue in mind?</MaryBubble>}
-      {(phase === 'q2' || phase === 'q2_date') && <YesNo onYes={() => handleVenue('yes')} onNo={() => handleVenue('no')} />}
+      {isPhase('q2') && (
+        <YesNo
+          onYes={() => setPhase('q2_yes')}
+          onNo={() => { setPhase('q2_no'); after(700, 'q2_typing'); after(1600, 'q3') }}
+        />
+      )}
 
-      {venueReply && <UserReply label={venueReply} />}
-      {phase === 'q2_typing' && <TypingIndicator />}
-
-      {show('q3_venue') && <MaryBubble>Perfect — where is it?</MaryBubble>}
-      {show('q3') && venueReply === 'Not yet' && <MaryBubble>That's completely fine — we'll leave a spot in Settings for when you're ready.</MaryBubble>}
-
-      {show('q3_venue') && (
-        <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-400">
-          <div className="flex flex-col gap-2 flex-1">
-            <label className="text-[14px] font-semibold text-[#1B1B1B]/55">Ceremony venue</label>
-            <input type="text" placeholder="Church of the Holy Cross, Lisbon" className={INPUT} />
+      {show('q2_yes') && !show('q2_confirmed') && (
+        <>
+          <UserReply label="Yes, we have a venue!" />
+          <MaryBubble>Lovely — what's it called or where is it?</MaryBubble>
+          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <input type="text" value={venue} onChange={e => setVenue(e.target.value)} placeholder="e.g. Palácio de Queluz, Sintra" className={INPUT} />
           </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <label className="text-[14px] font-semibold text-[#1B1B1B]/55">Reception venue <span className="font-normal text-[#1B1B1B]/30">(if different)</span></label>
-            <input type="text" placeholder="Palácio de Queluz" className={INPUT} />
-          </div>
+          {venue && <ConfirmButton onClick={confirmVenue} />}
+        </>
+      )}
+
+      {show('q2_no') && !show('q2_yes') && <UserReply label="Not yet" />}
+      {show('q2_confirmed') && venue && !show('q2_yes') && <UserReply label={`The venue is ${venue}`} />}
+      {isPhase('q2_typing') && <TypingIndicator />}
+
+      {show('q3') && !show('q2_yes') && (
+        <MaryBubble>
+          {venue ? 'Perfect, noted! Last one — roughly how many guests are you expecting?' : 'That\'s fine — we\'ll add the venue later. Last one — roughly how many guests are you expecting?'}
+        </MaryBubble>
+      )}
+
+      {show('q3') && !show('q2_yes') && (
+        <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <input type="number" min={0} value={guests} onChange={e => setGuests(e.target.value)}
+            placeholder="e.g. 180" className={`${INPUT} max-w-[220px]`} />
+          {guests && <ConfirmButton onClick={() => setPhase('q3_answered')} />}
         </div>
       )}
 
-      {/* Q3 — Guest count */}
-      {show('q3') && <MaryBubble>Last one, I promise — roughly how many guests are you expecting?</MaryBubble>}
-      {show('q3') && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-400">
-          <input type="number" min={0} placeholder="e.g. 180" className={`${INPUT} max-w-[220px]`} />
-        </div>
+      {show('q3_answered') && (
+        <>
+          <UserReply label={`Around ${guests} guests`} />
+          <MaryBubble>All set! You're ready to move on to the next step. 🎉</MaryBubble>
+        </>
       )}
     </div>
   )

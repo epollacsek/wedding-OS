@@ -9,7 +9,6 @@ import { getAllTimezones, searchTimezones, type TzEntry } from '@/lib/timezones'
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
   { label: 'Meet Mary', sub: 'Your AI event organizer - she\'ll guide you through the setup' },
-  { label: 'Your team', sub: 'People who help you manage it' },
   { label: 'Budget & comms', sub: 'Finance baseline and guest communication' },
 ]
 
@@ -422,7 +421,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {isPhase('q1_typing') && <TypingIndicator />}
       {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
         <MaryBubble>
-          {date?.from ? 'Got it, noted! Now, do you have a venue in mind?' : 'No worries at all — you can set the date in Settings any time. Now, do you have a venue in mind?'}
+          {date?.from ? 'Got it, noted! Now, do you have a venue in mind?' : 'No worries at all - you can set the date in Settings any time. Now, do you have a venue in mind?'}
         </MaryBubble>
       )}
 
@@ -451,7 +450,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
 
       {show('q3') && !show('q2_yes') && (
         <MaryBubble>
-          {venue ? 'Perfect, noted! Last one, roughly how many guests are you expecting?' : "That's fine — we'll add the venue later. Last one, roughly how many guests are you expecting?"}
+          {venue ? 'Perfect, noted! Last one, roughly how many guests are you expecting?' : "That's fine - we'll add the venue later. Last one, roughly how many guests are you expecting?"}
         </MaryBubble>
       )}
 
@@ -653,8 +652,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
         <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
           {step === 0 && <StepBasics />}
           {step === 1 && <StepIdentity userName={userName} {...tzProps} />}
-          {step === 2 && <StepTeam />}
-          {step === 3 && <StepBudgetComms />}
+          {step === 2 && <StepBudgetComms />}
         </div>
 
         {/* Footer */}

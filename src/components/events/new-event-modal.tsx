@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
@@ -233,6 +233,11 @@ function StepIdentity({ userName }: { userName: string }) {
   const show = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: Phase[]) => ps.includes(phase)
 
+  const bottomRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [phase, date])
+
   return (
     <div className="flex flex-col gap-5 p-4 rounded-2xl" style={{ background: 'linear-gradient(180deg, #FAF9FF 0%, #F5F3FF 100%)' }}>
       <style>{`@keyframes maryBounce { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-6px);opacity:1} }`}</style>
@@ -326,6 +331,8 @@ function StepIdentity({ userName }: { userName: string }) {
           <MaryBubble>All set! You're ready to move on to the next step. 🎉</MaryBubble>
         </>
       )}
+
+      <div ref={bottomRef} />
     </div>
   )
 }

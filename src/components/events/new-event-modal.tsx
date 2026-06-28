@@ -569,28 +569,32 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
       <DialogContent className="w-[90vw] sm:max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
         <DialogTitle className="sr-only">Create new event</DialogTitle>
 
-        {/* Timezone popup — floats in top-right corner of the modal, above overflow */}
+        {/* Timezone callout — slides up from the timezone pill */}
         {tzPopupVisible && !tzConfirmed && step === 1 && (
-          <div className="absolute top-4 right-4 z-[100] w-[270px] rounded-2xl bg-[#1B1B1B] px-5 py-4 shadow-[0_12px_40px_rgba(0,0,0,0.3)] animate-in fade-in slide-in-from-top-3 duration-300">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-[14px] font-semibold text-white">Confirm your timezone</p>
-              <button type="button" onClick={() => setTzPopupVisible(false)} className="text-white/30 hover:text-white/70 shrink-0">
-                <X className="size-4" />
-              </button>
+          <div className="absolute bottom-[72px] right-6 z-[100] w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-400">
+            <div className="rounded-2xl bg-[#1B1B1B] px-4 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.28)]">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <p className="text-[13px] font-semibold text-white leading-snug">
+                  We think you're in <span className="text-[#CBBDEA]">{selectedTz.cities[0]}</span> ({selectedTz.offset})
+                </p>
+                <button type="button" onClick={() => setTzPopupVisible(false)} className="text-white/30 hover:text-white/60 shrink-0 mt-0.5">
+                  <X className="size-3.5" />
+                </button>
+              </div>
+              <p className="text-[12px] text-white/45 mb-3">Tap below to confirm or change.</p>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => { setTzConfirmed(true); setTzPopupVisible(false) }}
+                  className="flex-1 h-7 rounded-lg bg-white text-[12px] font-semibold text-[#1B1B1B] hover:bg-white/90 transition-colors">
+                  Confirm
+                </button>
+                <button type="button" onClick={() => { setTzPopupVisible(false); setTzOpen(true); setTzSearch('') }}
+                  className="flex-1 h-7 rounded-lg bg-white/10 text-[12px] font-medium text-white hover:bg-white/20 transition-colors">
+                  Change
+                </button>
+              </div>
             </div>
-            <p className="text-[13px] text-white/55 leading-snug mb-4">
-              We think you're in <span className="text-white font-medium">{selectedTz.cities[0]}</span> ({selectedTz.offset}). Is that right?
-            </p>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => { setTzConfirmed(true); setTzPopupVisible(false) }}
-                className="flex-1 h-8 rounded-lg bg-white text-[13px] font-semibold text-[#1B1B1B] hover:bg-white/90 transition-colors">
-                Yes, confirm
-              </button>
-              <button type="button" onClick={() => { setTzPopupVisible(false); setTzOpen(true); setTzSearch('') }}
-                className="flex-1 h-8 rounded-lg bg-white/12 text-[13px] font-medium text-white hover:bg-white/20 transition-colors">
-                Change
-              </button>
-            </div>
+            {/* Arrow tail pointing down toward the pill */}
+            <div className="absolute bottom-[-6px] right-8 size-3 bg-[#1B1B1B] rotate-45 rounded-sm" />
           </div>
         )}
 

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
-  { label: 'Identity', sub: 'How the event looks and feels' },
+  { label: 'Let\'s get to know your event', sub: 'A few quick questions to get things set up' },
   { label: 'Your team', sub: 'People who help you manage it' },
   { label: 'Budget & comms', sub: 'Finance baseline and guest communication' },
 ]
@@ -117,37 +117,121 @@ function StepBasics() {
   )
 }
 
-function StepIdentity() {
-  const [selected, setSelected] = useState(COVER_COLOURS[0])
+function AiBubble({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-6">
-      <Field label="Cover colour" hint="Used on the event card and your wedding website header">
-        <div className="flex items-center gap-3 pt-1">
-          {COVER_COLOURS.map(c => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setSelected(c)}
-              className="size-10 rounded-full transition-all hover:scale-110 flex items-center justify-center"
-              style={{ backgroundColor: c, boxShadow: selected === c ? `0 0 0 3px white, 0 0 0 5px ${c}` : '0 2px 6px rgba(0,0,0,0.12)' }}
-            >
-              {selected === c && <Check className="size-4 text-white drop-shadow" />}
-            </button>
-          ))}
-          <input type="color" className="size-10 cursor-pointer rounded-full border border-[#1B1B1B]/15 bg-transparent p-1" title="Custom colour" />
-        </div>
-      </Field>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Host 1 name">
-          <input type="text" placeholder="Eduardo" className={INPUT} />
-        </Field>
-        <Field label="Host 2 name" hint="Leave empty for solo events">
-          <input type="text" placeholder="Ana" className={INPUT} />
-        </Field>
+    <div className="flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="size-8 rounded-full bg-[#1B1B1B] flex items-center justify-center shrink-0 mt-0.5">
+        <span className="text-white text-[11px] font-black tracking-tight">a.</span>
       </div>
-      <Field label="Tagline" hint="A short line shown on your wedding website">
-        <input type="text" placeholder="Together at last." className={INPUT} />
-      </Field>
+      <div className="rounded-2xl rounded-tl-sm bg-[#F4F2FF] px-4 py-3 max-w-[80%]">
+        <p className="text-[16px] text-[#1B1B1B] leading-snug">{children}</p>
+      </div>
+    </div>
+  )
+}
+
+function UserReply({ label }: { label: string }) {
+  return (
+    <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="rounded-2xl rounded-tr-sm bg-aroos-accent px-4 py-3">
+        <p className="text-[16px] text-white font-medium">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function YesNo({ onYes, onNo, yesLabel = 'Yes', noLabel = 'Not yet' }: { onYes: () => void; onNo: () => void; yesLabel?: string; noLabel?: string }) {
+  return (
+    <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <button type="button" onClick={onNo} className="h-10 rounded-full border border-[#1B1B1B]/15 bg-white px-5 text-[15px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.05] transition-colors">{noLabel}</button>
+      <button type="button" onClick={onYes} className="h-10 rounded-full bg-[#1B1B1B] px-5 text-[15px] font-medium text-white hover:bg-[#1B1B1B]/80 transition-colors">{yesLabel}</button>
+    </div>
+  )
+}
+
+function StepIdentity() {
+  const [dateAnswer, setDateAnswer] = useState<'yes' | 'no' | null>(null)
+  const [venueAnswer, setVenueAnswer] = useState<'yes' | 'no' | null>(null)
+
+  return (
+    <div className="flex flex-col gap-5 py-2">
+
+      {/* Q1 — Date */}
+      <AiBubble>Do you already have a date set for your event?</AiBubble>
+
+      {dateAnswer === null && (
+        <YesNo onYes={() => setDateAnswer('yes')} onNo={() => setDateAnswer('no')} />
+      )}
+
+      {dateAnswer === 'yes' && (
+        <>
+          <UserReply label="Yes, we have a date!" />
+          <AiBubble>Amazing — when is the big day?</AiBubble>
+          <div className="flex gap-4 ml-11 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex flex-col gap-1.5 flex-1">
+              <label className="text-[14px] font-medium text-[#1B1B1B]/60">Ceremony</label>
+              <input type="date" className={INPUT} />
+            </div>
+            <div className="flex flex-col gap-1.5 flex-1">
+              <label className="text-[14px] font-medium text-[#1B1B1B]/60">Reception <span className="text-[#1B1B1B]/35">(if different)</span></label>
+              <input type="date" className={INPUT} />
+            </div>
+          </div>
+        </>
+      )}
+
+      {dateAnswer === 'no' && (
+        <>
+          <UserReply label="Not yet" />
+          <AiBubble>No worries — you can add the date later in Settings.</AiBubble>
+        </>
+      )}
+
+      {/* Q2 — Venue (unlocks after date is answered) */}
+      {dateAnswer !== null && (
+        <>
+          <AiBubble>Do you have a venue in mind?</AiBubble>
+
+          {venueAnswer === null && (
+            <YesNo onYes={() => setVenueAnswer('yes')} onNo={() => setVenueAnswer('no')} />
+          )}
+
+          {venueAnswer === 'yes' && (
+            <>
+              <UserReply label="Yes, we have a venue!" />
+              <AiBubble>Lovely — what's the venue called or where is it?</AiBubble>
+              <div className="flex gap-4 ml-11 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label className="text-[14px] font-medium text-[#1B1B1B]/60">Ceremony venue</label>
+                  <input type="text" placeholder="Church of the Holy Cross, Lisbon" className={INPUT} />
+                </div>
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label className="text-[14px] font-medium text-[#1B1B1B]/60">Reception venue <span className="text-[#1B1B1B]/35">(if different)</span></label>
+                  <input type="text" placeholder="Palácio de Queluz" className={INPUT} />
+                </div>
+              </div>
+            </>
+          )}
+
+          {venueAnswer === 'no' && (
+            <>
+              <UserReply label="Not yet" />
+              <AiBubble>That's fine — we'll keep that in Settings for when you're ready.</AiBubble>
+            </>
+          )}
+        </>
+      )}
+
+      {/* Q3 — Guest count (unlocks after venue is answered) */}
+      {venueAnswer !== null && (
+        <>
+          <AiBubble>Roughly how many guests are you expecting?</AiBubble>
+          <div className="ml-11 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <input type="number" min={0} placeholder="e.g. 180" className={`${INPUT} max-w-[200px]`} />
+          </div>
+        </>
+      )}
+
     </div>
   )
 }

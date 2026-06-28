@@ -46,15 +46,15 @@ const EVENT_TYPES = [
   },
 ]
 
-const INPUT = 'h-11 w-full rounded-lg border border-[#1B1B1B]/15 bg-[#FAFAFA] px-4 text-[15px] text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/30 focus:border-aroos-accent focus:bg-white focus:ring-2 focus:ring-aroos-accent/15 transition-colors'
+const INPUT = 'h-12 w-full rounded-lg border border-[#1B1B1B]/15 bg-[#FAFAFA] px-4 text-[17px] text-[#1B1B1B] outline-none placeholder:text-[#1B1B1B]/30 focus:border-aroos-accent focus:bg-white focus:ring-2 focus:ring-aroos-accent/15 transition-colors'
 const COVER_COLOURS = ['#CBBDEA', '#A9C2C8', '#FFD6A5', '#B5EAD7', '#FF9AA2', '#2F2B25']
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
       <div>
-        <p className="text-[14px] font-semibold text-[#1B1B1B]">{label}</p>
-        {hint && <p className="text-[13px] text-[#1B1B1B]/45 mt-0.5">{hint}</p>}
+        <p className="text-[16px] font-semibold text-[#1B1B1B]">{label}</p>
+        {hint && <p className="text-[14px] text-[#1B1B1B]/45 mt-0.5">{hint}</p>}
       </div>
       {children}
     </div>
@@ -93,8 +93,8 @@ function StepBasics() {
                 <Icon className="size-5" style={{ color: iconColor }} />
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-[#1B1B1B]">{label}</p>
-                <p className="mt-1 text-[12px] leading-snug" style={{ color: active ? iconColor : 'rgba(27,27,27,0.45)' }}>{sub}</p>
+                <p className="text-[17px] font-semibold text-[#1B1B1B]">{label}</p>
+                <p className="mt-1 text-[14px] leading-snug" style={{ color: active ? iconColor : 'rgba(27,27,27,0.45)' }}>{sub}</p>
               </div>
             </button>
           )
@@ -240,9 +240,9 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
         {/* Header */}
         <div className="flex items-start justify-between px-8 pt-7 pb-5">
           <div>
-            <p className="text-[13px] font-medium text-[#1B1B1B]/40 mb-1">Step {step + 1} of {STEPS.length}</p>
-            <h2 className="text-[26px] font-bold leading-tight text-[#1B1B1B]">{STEPS[step].label}</h2>
-            <p className="text-[14px] text-[#1B1B1B]/50 mt-1">{STEPS[step].sub}</p>
+            <p className="text-[14px] font-medium text-[#1B1B1B]/40 mb-1">Step {step + 1} of {STEPS.length}</p>
+            <h2 className="text-[30px] font-bold leading-tight text-[#1B1B1B]">{STEPS[step].label}</h2>
+            <p className="text-[16px] text-[#1B1B1B]/50 mt-1">{STEPS[step].sub}</p>
           </div>
         </div>
 
@@ -261,7 +261,7 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         {/* Body */}
-        <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
+        <div className="px-8 pb-6 max-h-[66vh] overflow-y-auto">
           <StepComponent />
         </div>
 

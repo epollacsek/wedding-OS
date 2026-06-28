@@ -66,7 +66,7 @@ function StepBasics() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 p-2 -m-2">
         {EVENT_TYPES.map(({ value, icon: Icon, label, sub, accent, iconColor }) => {
           const active = selected === value
           return (

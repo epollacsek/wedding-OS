@@ -75,9 +75,9 @@ function StepBasics() {
               type="button"
               onClick={() => setSelected(value)}
               style={active ? { backgroundColor: accent, borderColor: iconColor } : {}}
-              className={`relative flex flex-col items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-200 scale-100 ${
+              className={`relative flex flex-col items-start gap-4 rounded-2xl p-5 text-left transition-all duration-200 ${
                 active
-                  ? 'border-2 shadow-[0_8px_32px_rgba(27,27,27,0.14)] scale-[1.03]'
+                  ? 'border-2 shadow-[0_8px_32px_rgba(27,27,27,0.14)]'
                   : 'border border-[#1B1B1B]/08 bg-white hover:border-[#1B1B1B]/15 hover:shadow-[0_2px_12px_rgba(27,27,27,0.06)]'
               }`}
             >

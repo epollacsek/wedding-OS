@@ -560,17 +560,27 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const pillRef = useRef<HTMLButtonElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
 
+  const measureAndShow = () => {
+    setTimeout(() => {
+      setTzPopupVisible(true)
+      // Re-measure after state update so pill is in DOM
+      setTimeout(() => {
+        if (pillRef.current && modalRef.current) {
+          const pill = pillRef.current.getBoundingClientRect()
+          const modal = modalRef.current.getBoundingClientRect()
+          setPillPos({
+            top: pill.bottom - modal.top + 10,
+            right: modal.right - pill.right
+          })
+        }
+      }, 50)
+    }, 800)
+  }
+
   const tzProps = {
     selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed,
     tzOpen, setTzOpen, tzSearch, setTzSearch, pillRef,
-    onCalendarOpen: () => setTimeout(() => {
-      if (pillRef.current && modalRef.current) {
-        const pill = pillRef.current.getBoundingClientRect()
-        const modal = modalRef.current.getBoundingClientRect()
-        setPillPos({ top: pill.bottom - modal.top + 8, right: modal.right - pill.right })
-      }
-      setTzPopupVisible(true)
-    }, 800)
+    onCalendarOpen: measureAndShow
   }
 
   function handleClose() {

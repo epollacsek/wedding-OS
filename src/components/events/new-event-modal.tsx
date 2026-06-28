@@ -210,6 +210,7 @@ function StepIdentity({ userName }: { userName: string }) {
   const [selectedTz, setSelectedTz] = useState<TzEntry>(detectedEntry)
   const [tzConfirmed, setTzConfirmed] = useState(false)
   const [tzOpen, setTzOpen] = useState(false)
+  const [tzPopupVisible, setTzPopupVisible] = useState(false)
   const [tzSearch, setTzSearch] = useState('')
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
@@ -218,6 +219,7 @@ function StepIdentity({ userName }: { userName: string }) {
     if (phase === 'intro') setTimeout(() => setPhase('intro2'), 900)
     if (phase === 'intro2') setTimeout(() => setPhase('intro_typing'), 1400)
     if (phase === 'intro_typing') setTimeout(() => setPhase('q1'), 1000)
+    if (phase === 'q1_yes') setTimeout(() => setTzPopupVisible(true), 800)
   }, [phase])
 
   function after(ms: number, next: Phase) { setTimeout(() => setPhase(next), ms) }
@@ -297,34 +299,62 @@ function StepIdentity({ userName }: { userName: string }) {
                 <span className="text-[15px] text-[#1B1B1B]/35">Select a date range on the calendar</span>
               )}
 
-              {/* Timezone pill */}
+              {/* Timezone */}
               <div className="relative shrink-0 ml-3">
+
+                {/* Auto popup */}
+                {tzPopupVisible && !tzConfirmed && !tzOpen && (
+                  <div className="absolute bottom-full right-0 mb-2 z-50 w-[280px] rounded-2xl bg-[#1B1B1B] px-4 py-3 shadow-[0_8px_32px_rgba(27,27,27,0.25)] animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-[13px] font-semibold text-white">Your timezone</p>
+                        <p className="text-[12px] text-white/60 mt-0.5 leading-snug">
+                          We detected <span className="text-white font-medium">{selectedTz.offset}</span> ({selectedTz.cities[0]}). Is that right?
+                        </p>
+                      </div>
+                      <button type="button" onClick={() => setTzPopupVisible(false)} className="text-white/30 hover:text-white/60 shrink-0 mt-0.5">
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button type="button" onClick={() => { setTzConfirmed(true); setTzPopupVisible(false) }}
+                        className="flex-1 h-7 rounded-lg bg-white text-[12px] font-semibold text-[#1B1B1B] hover:bg-white/90 transition-colors">
+                        Confirm
+                      </button>
+                      <button type="button" onClick={() => { setTzPopupVisible(false); setTzOpen(true); setTzSearch('') }}
+                        className="flex-1 h-7 rounded-lg bg-white/10 text-[12px] font-medium text-white hover:bg-white/20 transition-colors">
+                        Change
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pill */}
                 <button
                   type="button"
-                  onClick={() => { setTzOpen(v => !v); setTzSearch('') }}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-all ${
+                  onClick={() => { setTzOpen(v => !v); setTzPopupVisible(false); setTzSearch('') }}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all ${
                     tzConfirmed
                       ? 'bg-[#F0FDF4] text-green-700 border border-green-200'
-                      : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                      : 'bg-[#1B1B1B]/06 text-[#1B1B1B]/60 border border-[#1B1B1B]/10 hover:border-[#1B1B1B]/20'
                   }`}
                 >
-                  {tzConfirmed ? (
-                    <><Check className="size-3.5 text-green-600" /> {selectedTz.offset} — {selectedTz.label.split('—')[0].trim()}</>
-                  ) : (
-                    <><span className="size-2 rounded-full bg-amber-400 animate-pulse inline-block" /> Confirm timezone</>
-                  )}
+                  {tzConfirmed
+                    ? <><Check className="size-3 text-green-600" /> {selectedTz.offset} · {selectedTz.cities[0]}</>
+                    : <>{selectedTz.offset} · {selectedTz.cities[0]}</>
+                  }
                 </button>
 
+                {/* Search dropdown */}
                 {tzOpen && (
                   <div className="absolute right-0 top-full mt-2 z-50 w-[380px] rounded-2xl border border-[#1B1B1B]/10 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.18)] overflow-hidden">
                     <div className="p-3 border-b border-[#1B1B1B]/08">
-                      <p className="text-[12px] font-semibold text-[#1B1B1B]/40 uppercase tracking-wide mb-2">Select your timezone</p>
                       <input
                         autoFocus
                         type="text"
                         value={tzSearch}
                         onChange={e => setTzSearch(e.target.value)}
-                        placeholder="Search by city — e.g. Rio de Janeiro, London, Dubai…"
+                        placeholder="Search by city, e.g. Rio de Janeiro, London, Dubai"
                         className="w-full rounded-lg border border-[#1B1B1B]/12 bg-[#FAFAFA] px-3 py-2 text-[14px] outline-none focus:border-aroos-accent focus:ring-2 focus:ring-aroos-accent/15"
                       />
                     </div>
@@ -340,7 +370,7 @@ function StepIdentity({ userName }: { userName: string }) {
                             <p className="text-[14px] font-medium text-[#1B1B1B] leading-tight">{t.label}</p>
                             <p className="text-[12px] text-[#1B1B1B]/40 mt-0.5 truncate">{t.cities.slice(0, 5).join(', ')}</p>
                           </div>
-                          <span className="text-[13px] font-mono font-semibold text-[#1B1B1B]/50 shrink-0 mt-0.5">{t.offset}</span>
+                          <span className="text-[12px] font-mono font-semibold text-[#1B1B1B]/50 shrink-0 mt-0.5">{t.offset}</span>
                         </button>
                       ))}
                     </div>

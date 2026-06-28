@@ -200,10 +200,20 @@ function ConfirmButton({ onClick }: { onClick: () => void }) {
 function StepIdentity({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
-  const [startMinutes, setStartMinutes] = useState(600)  // 10:00
-  const [endMinutes, setEndMinutes] = useState(1320)     // 22:00
+  const [startMinutes, setStartMinutes] = useState(600)
+  const [endMinutes, setEndMinutes] = useState(1320)
   const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
+  const [timezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone)
+  const [tzOffset] = useState(() => {
+    const offset = -new Date().getTimezoneOffset()
+    const sign = offset >= 0 ? '+' : '-'
+    const h = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0')
+    const m = (Math.abs(offset) % 60).toString().padStart(2, '0')
+    return `GMT${sign}${h}:${m}`
+  })
+  const [tzConfirmed, setTzConfirmed] = useState(false)
+  const [tzDismissed, setTzDismissed] = useState(false)
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -263,7 +273,40 @@ function StepIdentity({ userName }: { userName: string }) {
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden relative">
+
+            {/* Timezone popup */}
+            {!tzConfirmed && !tzDismissed && (
+              <div className="absolute top-14 right-4 z-10 w-[220px] rounded-xl border border-[#1B1B1B]/10 bg-white shadow-[0_8px_24px_rgba(27,27,27,0.12)] p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-[13px] font-semibold text-[#1B1B1B]">Confirm your timezone</p>
+                  <button type="button" onClick={() => setTzDismissed(true)} className="text-[#1B1B1B]/30 hover:text-[#1B1B1B]/60 transition-colors shrink-0">
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+                <p className="text-[12px] text-[#1B1B1B]/55 leading-snug mb-3">
+                  We detected <span className="font-semibold text-[#1B1B1B]">{timezone}</span> ({tzOffset}). Is that right?
+                </p>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setTzConfirmed(true)}
+                    className="flex-1 h-8 rounded-lg bg-[#1B1B1B] text-[12px] font-semibold text-white hover:bg-[#333] transition-colors">
+                    Yes, that's me
+                  </button>
+                  <button type="button" onClick={() => setTzDismissed(true)}
+                    className="flex-1 h-8 rounded-lg border border-[#1B1B1B]/12 text-[12px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
+                    Change
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Confirmed badge */}
+            {tzConfirmed && (
+              <div className="absolute top-14 right-4 z-10 flex items-center gap-1.5 rounded-full bg-[#E8F5E9] px-3 py-1.5 animate-in fade-in duration-300">
+                <div className="size-2 rounded-full bg-green-500" />
+                <p className="text-[12px] font-medium text-green-700">{timezone} · {tzOffset}</p>
+              </div>
+            )}
 
             {/* Summary bar */}
             <div className="flex items-center justify-between border-b border-[#1B1B1B]/08 bg-[#FAFAFA] px-5 py-3">

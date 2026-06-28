@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
 
@@ -263,7 +263,35 @@ function StepIdentity({ userName }: { userName: string }) {
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden flex">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden">
+
+            {/* Summary bar */}
+            <div className="flex items-center justify-between border-b border-[#1B1B1B]/08 bg-[#FAFAFA] px-5 py-3">
+              {date?.from ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-[15px] font-semibold text-[#1B1B1B]">
+                    {date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {date.to && date.to.getTime() !== date.from.getTime() && (
+                      <> → {date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</>
+                    )}
+                  </span>
+                  <span className="text-[#1B1B1B]/30">·</span>
+                  <span className="text-[15px] text-[#1B1B1B]/60">
+                    {(() => {
+                      const fmt = (m: number) => { const h = Math.floor(m/60); const min = m%60; const ap = h>=12?'PM':'AM'; return `${h%12||12}:${min.toString().padStart(2,'0')} ${ap}` }
+                      return `${fmt(startMinutes)} → ${fmt(endMinutes)}`
+                    })()}
+                  </span>
+                  <button type="button" onClick={() => setDate(undefined)} className="ml-2 size-5 rounded-full bg-[#1B1B1B]/10 flex items-center justify-center hover:bg-[#1B1B1B]/20 transition-colors">
+                    <X className="size-3 text-[#1B1B1B]/60" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-[15px] text-[#1B1B1B]/35">Select a date range on the calendar</span>
+              )}
+            </div>
+
+            <div className="flex">
             {/* Calendar — takes most of the space */}
             <div className="flex-[7] min-w-0">
               <Calendar
@@ -305,7 +333,8 @@ function StepIdentity({ userName }: { userName: string }) {
                 )
               })}
             </div>
-          </div>
+            </div>{/* end flex row */}
+          </div>{/* end outer container */}
           {date?.from && <ConfirmButton onClick={confirmDate} />}
         </>
       )}

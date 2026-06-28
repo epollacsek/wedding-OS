@@ -74,26 +74,27 @@ function StepBasics() {
               key={value}
               type="button"
               onClick={() => setSelected(value)}
-              className={`relative flex flex-col items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-200 ${
+              style={active ? { backgroundColor: accent, borderColor: iconColor } : {}}
+              className={`relative flex flex-col items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-200 scale-100 ${
                 active
-                  ? 'border-[#1B1B1B]/20 bg-white shadow-[0_4px_20px_rgba(27,27,27,0.10)]'
-                  : 'border-[#1B1B1B]/08 bg-white hover:border-[#1B1B1B]/15 hover:shadow-[0_2px_12px_rgba(27,27,27,0.06)]'
+                  ? 'border-2 shadow-[0_8px_32px_rgba(27,27,27,0.14)] scale-[1.03]'
+                  : 'border border-[#1B1B1B]/08 bg-white hover:border-[#1B1B1B]/15 hover:shadow-[0_2px_12px_rgba(27,27,27,0.06)]'
               }`}
             >
               {active && (
-                <div className="absolute top-3 right-3 size-5 rounded-full bg-[#1B1B1B] flex items-center justify-center">
+                <div className="absolute top-3 right-3 size-5 rounded-full flex items-center justify-center" style={{ backgroundColor: iconColor }}>
                   <Check className="size-3 text-white" />
                 </div>
               )}
               <div
                 className="size-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: accent }}
+                style={{ backgroundColor: active ? 'rgba(255,255,255,0.4)' : accent }}
               >
                 <Icon className="size-5" style={{ color: iconColor }} />
               </div>
               <div>
                 <p className="text-[15px] font-semibold text-[#1B1B1B]">{label}</p>
-                <p className="mt-1 text-[12px] leading-snug text-[#1B1B1B]/45">{sub}</p>
+                <p className="mt-1 text-[12px] leading-snug" style={{ color: active ? iconColor : 'rgba(27,27,27,0.45)' }}>{sub}</p>
               </div>
             </button>
           )

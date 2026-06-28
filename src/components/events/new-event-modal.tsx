@@ -181,7 +181,7 @@ export function NewEventModal({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) handleClose() }}>
-      <DialogContent className="w-[90vw] max-w-[600px] p-0 gap-0 rounded-2xl overflow-hidden">
+      <DialogContent className="w-[90vw] max-w-[1200px] p-0 gap-0 rounded-2xl overflow-hidden">
         <DialogTitle className="sr-only">Create new event</DialogTitle>
 
         {/* Header */}

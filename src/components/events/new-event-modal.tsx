@@ -265,7 +265,7 @@ function StepIdentity({ userName }: { userName: string }) {
           <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl bg-white border border-[#1B1B1B]/08 shadow-sm overflow-hidden flex">
             {/* Calendar — takes most of the space */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-[7] min-w-0">
               <Calendar
                 mode="range"
                 selected={date}
@@ -278,7 +278,7 @@ function StepIdentity({ userName }: { userName: string }) {
             </div>
 
             {/* Time picker — right panel */}
-            <div className="w-[220px] shrink-0 border-l border-[#1B1B1B]/08 p-6 flex flex-col gap-8 justify-center">
+            <div className="flex-[3] shrink-0 border-l border-[#1B1B1B]/08 p-6 flex flex-col gap-8 justify-center">
               {[
                 { label: 'Starts at', value: startMinutes, onChange: setStartMinutes },
                 { label: 'Ends at', value: endMinutes, onChange: (v: number) => setEndMinutes(Math.max(v, startMinutes + 30)) },

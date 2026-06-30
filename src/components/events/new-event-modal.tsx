@@ -6,6 +6,29 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
 import { getAllTimezones, searchTimezones, type TzEntry } from '@/lib/timezones'
 
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+    </svg>
+  )
+}
+
+function OutlookIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <rect x="2" y="4" width="13" height="16" rx="1.5" fill="#0364B8" />
+      <path fill="#0A2767" d="M2 7.5h13v9H2z" />
+      <path fill="#28A8EA" d="M22 6.5v11c0 .55-.45 1-1 1h-6.5v-13H21c.55 0 1 .45 1 1z" />
+      <circle cx="8.5" cy="12" r="3.2" fill="#fff" />
+      <circle cx="8.5" cy="12" r="2.1" fill="#0364B8" />
+    </svg>
+  )
+}
+
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
   { label: 'Meet Mary', sub: 'Your AI event organizer - she\'ll guide you through the setup' },
@@ -181,7 +204,8 @@ function YesNo({ onYes, onNo, yesLabel = 'Yes', noLabel = 'Not yet' }: {
 type Phase =
   | 'intro' | 'intro2' | 'intro_typing' | 'q1'
   | 'q1_yes' | 'q1_no'
-  | 'q1_confirmed' | 'q1_typing' | 'done'
+  | 'q1_confirmed' | 'q1_typing' | 'q2'
+  | 'q2_connecting' | 'q2_connected' | 'q2_skipped' | 'done'
 
 function ConfirmButton({ onClick }: { onClick: () => void }) {
   return (
@@ -213,6 +237,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
+  const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null)
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -228,12 +253,27 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   function confirmDate() {
     setPhase('q1_confirmed')
     after(700, 'q1_typing')
-    after(1600, 'done')
+    after(1600, 'q2')
+  }
+
+  // TODO: swap this simulated connect for real OAuth once Google/Microsoft
+  // apps are registered (see GoogleCalendarConnect / OutlookConnect below).
+  function connectCalendar(provider: 'google' | 'outlook') {
+    setCalendarProvider(provider)
+    setPhase('q2_connecting')
+    after(1300, 'q2_connected')
+    after(2300, 'done')
+  }
+
+  function skipCalendar() {
+    setPhase('q2_skipped')
+    after(900, 'done')
   }
 
   const order: Phase[] = [
     'intro','intro2','intro_typing','q1',
-    'q1_yes','q1_no','q1_confirmed','q1_typing','done'
+    'q1_yes','q1_no','q1_confirmed','q1_typing','q2',
+    'q2_connecting','q2_connected','q2_skipped','done'
   ]
   const show = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: Phase[]) => ps.includes(phase)
@@ -257,7 +297,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {isPhase('q1') && (
         <YesNo
           onYes={() => setPhase('q1_yes')}
-          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'done') }}
+          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
         />
       )}
 
@@ -408,9 +448,45 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
 
+      {/* Q2 — Calendar sync */}
+      {show('q2') && (
+        <MaryBubble>
+          One more thing - want to connect your calendar so deliverables and due dates sync automatically?
+        </MaryBubble>
+      )}
+
+      {isPhase('q2') && (
+        <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
+          <button type="button" onClick={skipCalendar}
+            className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
+            Skip for now
+          </button>
+          <button type="button" onClick={() => connectCalendar('outlook')}
+            className="h-11 flex items-center gap-2 rounded-full border border-[#1B1B1B]/15 bg-white px-5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
+            <OutlookIcon className="size-5" /> Outlook
+          </button>
+          <button type="button" onClick={() => connectCalendar('google')}
+            className="h-11 flex items-center gap-2 rounded-full bg-[#1B1B1B] px-5 text-[16px] font-semibold text-white hover:bg-[#333] transition-colors">
+            <GoogleIcon className="size-5" /> Google Calendar
+          </button>
+        </div>
+      )}
+
+      {isPhase('q2_skipped') && <UserReply label="Skip for now" />}
+
+      {(isPhase('q2_connecting') || show('q2_connected')) && (
+        <UserReply label={`Connect ${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'}`} />
+      )}
+      {isPhase('q2_connecting') && <TypingIndicator />}
+      {show('q2_connected') && !isPhase('q2_connecting') && (
+        <MaryBubble>
+          {calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'} connected! Deliverables and due dates will sync automatically. ✅
+        </MaryBubble>
+      )}
+
       {show('done') && (
         <MaryBubble>
-          {date?.from ? "Got it! You're all set, ready to move on to the next step. 🎉" : "No worries - you can set the date in Settings any time. You're all set! 🎉"}
+          Let's move to the next part of setting things up.
         </MaryBubble>
       )}
 

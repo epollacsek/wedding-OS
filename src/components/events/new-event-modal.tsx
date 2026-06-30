@@ -181,8 +181,7 @@ function YesNo({ onYes, onNo, yesLabel = 'Yes', noLabel = 'Not yet' }: {
 type Phase =
   | 'intro' | 'intro2' | 'intro_typing' | 'q1'
   | 'q1_yes' | 'q1_no'
-  | 'q1_confirmed' | 'q1_typing' | 'q2'
-  | 'q2_answered'
+  | 'q1_confirmed' | 'q1_typing' | 'done'
 
 function ConfirmButton({ onClick }: { onClick: () => void }) {
   return (
@@ -214,7 +213,6 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
-  const [guests, setGuests] = useState('')
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -230,13 +228,12 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   function confirmDate() {
     setPhase('q1_confirmed')
     after(700, 'q1_typing')
-    after(1600, 'q2')
+    after(1600, 'done')
   }
 
   const order: Phase[] = [
     'intro','intro2','intro_typing','q1',
-    'q1_yes','q1_no','q1_confirmed','q1_typing','q2',
-    'q2_yes','q2_no','q2_confirmed','q2_typing','q3','q3_answered'
+    'q1_yes','q1_no','q1_confirmed','q1_typing','done'
   ]
   const show = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: Phase[]) => ps.includes(phase)
@@ -260,7 +257,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {isPhase('q1') && (
         <YesNo
           onYes={() => setPhase('q1_yes')}
-          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
+          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'done') }}
         />
       )}
 
@@ -411,26 +408,10 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
 
-      {/* Q2 — Guest count */}
-      {show('q2') && (
+      {show('done') && (
         <MaryBubble>
-          {date?.from ? 'Got it! Last one - roughly how many guests are you expecting?' : 'No worries - you can set the date in Settings any time. Last one, how many guests are you expecting?'}
+          {date?.from ? "Got it! You're all set, ready to move on to the next step. 🎉" : "No worries - you can set the date in Settings any time. You're all set! 🎉"}
         </MaryBubble>
-      )}
-
-      {show('q2') && !show('q2_answered') && (
-        <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <input type="number" min={0} value={guests} onChange={e => setGuests(e.target.value)}
-            placeholder="e.g. 180" className={`${INPUT} max-w-[220px]`} />
-          {guests && <ConfirmButton onClick={() => setPhase('q2_answered')} />}
-        </div>
-      )}
-
-      {show('q2_answered') && (
-        <>
-          <UserReply label={`Around ${guests} guests`} />
-          <MaryBubble>All set! You're ready to move on to the next step. 🎉</MaryBubble>
-        </>
       )}
 
       <div ref={bottomRef} />

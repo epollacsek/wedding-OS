@@ -238,6 +238,12 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null)
+  // Explicit branch tracking — q1/q2 fork into mutually exclusive paths, so a
+  // single linear order-index comparison (show()) can't tell them apart once
+  // phase has advanced past both branches' indices. Track the actual answer.
+  const [dateAnswer, setDateAnswer] = useState<'yes' | 'no' | null>(null)
+  const [dateConfirmed, setDateConfirmed] = useState(false)
+  const [calendarAnswer, setCalendarAnswer] = useState<'skip' | 'connect' | null>(null)
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -251,6 +257,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   function after(ms: number, next: Phase) { setTimeout(() => setPhase(next), ms) }
 
   function confirmDate() {
+    setDateConfirmed(true)
     setPhase('q1_confirmed')
     after(700, 'q1_typing')
     after(1600, 'q2')
@@ -260,12 +267,14 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   // apps are registered (see GoogleCalendarConnect / OutlookConnect below).
   function connectCalendar(provider: 'google' | 'outlook') {
     setCalendarProvider(provider)
+    setCalendarAnswer('connect')
     setPhase('q2_connecting')
     after(1300, 'q2_connected')
     after(2300, 'done')
   }
 
   function skipCalendar() {
+    setCalendarAnswer('skip')
     setPhase('q2_skipped')
     after(900, 'done')
   }
@@ -296,8 +305,8 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {show('q1') && <MaryBubble>First, do you already have a date set for your event?</MaryBubble>}
       {isPhase('q1') && (
         <YesNo
-          onYes={() => setPhase('q1_yes')}
-          onNo={() => { setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
+          onYes={() => { setDateAnswer('yes'); setPhase('q1_yes') }}
+          onNo={() => { setDateAnswer('no'); setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
         />
       )}
 
@@ -436,10 +445,10 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
 
       {/* No path */}
-      {show('q1_no') && <UserReply label="Not yet" />}
+      {dateAnswer === 'no' && <UserReply label="Not yet" />}
 
       {/* After date confirmed */}
-      {show('q1_confirmed') && phase !== 'q1_yes' && date?.from && (
+      {dateConfirmed && date?.from && (
         <UserReply label={
           date.to && date.to.getTime() !== date.from.getTime()
             ? `Dates confirmed for ${date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} - ${date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
@@ -472,13 +481,13 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
         </div>
       )}
 
-      {isPhase('q2_skipped') && <UserReply label="Skip for now" />}
+      {calendarAnswer === 'skip' && <UserReply label="Skip for now" />}
 
-      {(isPhase('q2_connecting') || show('q2_connected')) && (
+      {calendarAnswer === 'connect' && (
         <UserReply label={`Connect ${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'}`} />
       )}
       {isPhase('q2_connecting') && <TypingIndicator />}
-      {show('q2_connected') && !isPhase('q2_connecting') && (
+      {calendarAnswer === 'connect' && !isPhase('q2_connecting') && (
         <MaryBubble>
           {calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'} connected! Deliverables and due dates will sync automatically. ✅
         </MaryBubble>

@@ -262,7 +262,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
 
       {/* Yes path — date + time picker */}
-      {show('q1_yes') && !show('q1_confirmed') && (
+      {phase === 'q1_yes' && (
         <>
           <UserReply label="Yes, we have a date!" />
           <MaryBubble>Wonderful! Pick the date and time below.</MaryBubble>
@@ -396,7 +396,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
 
       {/* No path */}
-      {show('q1_no') && !show('q1_yes') && <UserReply label="Not yet" />}
+      {show('q1_no') && <UserReply label="Not yet" />}
 
       {/* After date confirmed */}
       {show('q1_confirmed') && phase !== 'q1_yes' && date?.from && (

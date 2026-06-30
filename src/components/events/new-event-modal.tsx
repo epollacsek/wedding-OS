@@ -29,10 +29,18 @@ function OutlookIcon({ className }: { className?: string }) {
   )
 }
 
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="#25D366">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.27-1.38a9.9 9.9 0 0 0 4.77 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.13a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.13.82.84-3.05-.2-.31a8.17 8.17 0 0 1-1.26-4.36c0-4.52 3.68-8.2 8.21-8.2 2.19 0 4.25.85 5.8 2.4a8.14 8.14 0 0 1 2.4 5.81c0 4.53-3.68 8.21-8.18 8.21zm4.49-6.15c-.25-.12-1.45-.72-1.67-.8-.22-.08-.39-.12-.55.13-.16.24-.63.8-.78.96-.14.16-.29.18-.53.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.31-.22.25-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.13 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.47-.28z" />
+    </svg>
+  )
+}
+
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
   { label: 'Meet Mary', sub: 'Your AI event organizer - she\'ll guide you through the setup' },
-  { label: 'Budget & comms', sub: 'Finance baseline and guest communication' },
+  { label: 'Stay connected', sub: 'Sync your calendar and WhatsApp so nothing slips through' },
 ]
 
 const EVENT_TYPES = [
@@ -204,8 +212,7 @@ function YesNo({ onYes, onNo, yesLabel = 'Yes', noLabel = 'Not yet' }: {
 type Phase =
   | 'intro' | 'intro2' | 'intro_typing' | 'q1'
   | 'q1_yes' | 'q1_no'
-  | 'q1_confirmed' | 'q1_typing' | 'q2'
-  | 'q2_connecting' | 'q2_connected' | 'q2_skipped' | 'done'
+  | 'q1_confirmed' | 'q1_typing' | 'done'
 
 function ConfirmButton({ onClick }: { onClick: () => void }) {
   return (
@@ -237,13 +244,11 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
-  const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null)
-  // Explicit branch tracking — q1/q2 fork into mutually exclusive paths, so a
-  // single linear order-index comparison (show()) can't tell them apart once
-  // phase has advanced past both branches' indices. Track the actual answer.
+  // Explicit branch tracking — q1 forks into mutually exclusive yes/no paths,
+  // so a single linear order-index comparison (show()) can't tell them apart
+  // once phase has advanced past both branches' indices. Track the actual answer.
   const [dateAnswer, setDateAnswer] = useState<'yes' | 'no' | null>(null)
   const [dateConfirmed, setDateConfirmed] = useState(false)
-  const [calendarAnswer, setCalendarAnswer] = useState<'skip' | 'connect' | null>(null)
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
@@ -260,29 +265,12 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
     setDateConfirmed(true)
     setPhase('q1_confirmed')
     after(700, 'q1_typing')
-    after(1600, 'q2')
-  }
-
-  // TODO: swap this simulated connect for real OAuth once Google/Microsoft
-  // apps are registered (see GoogleCalendarConnect / OutlookConnect below).
-  function connectCalendar(provider: 'google' | 'outlook') {
-    setCalendarProvider(provider)
-    setCalendarAnswer('connect')
-    setPhase('q2_connecting')
-    after(1300, 'q2_connected')
-    after(2300, 'done')
-  }
-
-  function skipCalendar() {
-    setCalendarAnswer('skip')
-    setPhase('q2_skipped')
-    after(900, 'done')
+    after(1600, 'done')
   }
 
   const order: Phase[] = [
     'intro','intro2','intro_typing','q1',
-    'q1_yes','q1_no','q1_confirmed','q1_typing','q2',
-    'q2_connecting','q2_connected','q2_skipped','done'
+    'q1_yes','q1_no','q1_confirmed','q1_typing','done'
   ]
   const show = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: Phase[]) => ps.includes(phase)
@@ -306,7 +294,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {isPhase('q1') && (
         <YesNo
           onYes={() => { setDateAnswer('yes'); setPhase('q1_yes') }}
-          onNo={() => { setDateAnswer('no'); setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'q2') }}
+          onNo={() => { setDateAnswer('no'); setPhase('q1_no'); after(700, 'q1_typing'); after(1600, 'done') }}
         />
       )}
 
@@ -457,42 +445,6 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
 
-      {/* Q2 — Calendar sync */}
-      {show('q2') && (
-        <MaryBubble>
-          One more thing - want to connect your calendar so deliverables and due dates sync automatically?
-        </MaryBubble>
-      )}
-
-      {isPhase('q2') && (
-        <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
-          <button type="button" onClick={skipCalendar}
-            className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
-            Skip for now
-          </button>
-          <button type="button" onClick={() => connectCalendar('outlook')}
-            className="h-11 flex items-center gap-2 rounded-full border border-[#1B1B1B]/15 bg-white px-5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
-            <OutlookIcon className="size-5" /> Outlook
-          </button>
-          <button type="button" onClick={() => connectCalendar('google')}
-            className="h-11 flex items-center gap-2 rounded-full bg-[#1B1B1B] px-5 text-[16px] font-semibold text-white hover:bg-[#333] transition-colors">
-            <GoogleIcon className="size-5" /> Google Calendar
-          </button>
-        </div>
-      )}
-
-      {calendarAnswer === 'skip' && <UserReply label="Skip for now" />}
-
-      {calendarAnswer === 'connect' && (
-        <UserReply label={`Connect ${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'}`} />
-      )}
-      {isPhase('q2_connecting') && <TypingIndicator />}
-      {calendarAnswer === 'connect' && !isPhase('q2_connecting') && (
-        <MaryBubble>
-          {calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'} connected! Deliverables and due dates will sync automatically. ✅
-        </MaryBubble>
-      )}
-
       {show('done') && (
         <MaryBubble>
           Let's move to the next part of setting things up.
@@ -526,48 +478,141 @@ function StepTeam() {
   )
 }
 
-function StepBudgetComms() {
+type CommsPhase =
+  | 'intro' | 'intro2' | 'cal_q'
+  | 'cal_typing' | 'wa_intro'
+  | 'wa_sending' | 'wa_sent'
+
+function StepComms({ userName }: { userName: string }) {
+  const [phase, setPhase] = useState<CommsPhase>('intro')
+  const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null)
+  const [calendarAnswer, setCalendarAnswer] = useState<'skip' | 'connect' | null>(null)
+  const [waConnecting, setWaConnecting] = useState(false)
+  const [waConnected, setWaConnected] = useState(false)
+
+  const firstName = userName === 'there' ? '' : `, ${userName}`
+
+  useEffect(() => {
+    if (phase === 'intro') setTimeout(() => setPhase('intro2'), 900)
+    if (phase === 'intro2') setTimeout(() => setPhase('cal_q'), 1400)
+  }, [phase])
+
+  function after(ms: number, fn: () => void) { setTimeout(fn, ms) }
+
+  // TODO: swap this simulated connect for real OAuth once Google/Microsoft
+  // apps are registered in Google Cloud Console / Azure Portal.
+  function connectCalendar(provider: 'google' | 'outlook') {
+    setCalendarProvider(provider)
+    setCalendarAnswer('connect')
+    setPhase('cal_typing')
+    after(1300, () => setPhase('wa_intro'))
+  }
+
+  function skipCalendar() {
+    setCalendarAnswer('skip')
+    setPhase('cal_typing')
+    after(900, () => setPhase('wa_intro'))
+  }
+
+  // TODO: swap for real WhatsApp Business API opt-in once available.
+  function connectWhatsApp() {
+    setWaConnecting(true)
+    setPhase('wa_sending')
+    after(1500, () => { setWaConnected(true); setPhase('wa_sent') })
+  }
+
+  const order: CommsPhase[] = ['intro', 'intro2', 'cal_q', 'cal_typing', 'wa_intro', 'wa_sending', 'wa_sent']
+  const show = (p: CommsPhase) => order.indexOf(phase) >= order.indexOf(p)
+  const isPhase = (...ps: CommsPhase[]) => ps.includes(phase)
+
+  const bottomRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [phase])
+
   return (
-    <div className="flex flex-col gap-6">
-      <Field label="Total budget">
-        <div className="flex items-center gap-2">
-          <select className={`${INPUT} w-[90px] shrink-0`}>
-            <option>EUR</option>
-            <option>USD</option>
-            <option>GBP</option>
-            <option>BRL</option>
-          </select>
-          <input type="number" min={0} placeholder="50 000" className={INPUT} />
+    <div className="flex flex-col gap-5 p-4 rounded-2xl" style={{ background: 'linear-gradient(180deg, #FAF9FF 0%, #F5F3FF 100%)' }}>
+      <style>{`@keyframes maryBounce { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-6px);opacity:1} }`}</style>
+
+      {/* Storytelling intro */}
+      {show('intro') && (
+        <MaryBubble>
+          One last thing{firstName} - a couple of small connections that make a big difference in how smooth this gets.
+        </MaryBubble>
+      )}
+      {show('intro2') && (
+        <MaryBubble>
+          If we sync your calendar, deliverables and due dates show up automatically. And with WhatsApp connected, I can ping you directly about RSVPs and anything that needs your attention - much faster than digging through email.
+        </MaryBubble>
+      )}
+
+      {/* Calendar question */}
+      {show('cal_q') && <MaryBubble>Want to connect a calendar?</MaryBubble>}
+      {isPhase('cal_q') && (
+        <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
+          <button type="button" onClick={skipCalendar}
+            className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
+            Skip for now
+          </button>
+          <button type="button" onClick={() => connectCalendar('outlook')}
+            className="h-11 flex items-center gap-2 rounded-full border border-[#1B1B1B]/15 bg-white px-5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
+            <OutlookIcon className="size-5" /> Outlook
+          </button>
+          <button type="button" onClick={() => connectCalendar('google')}
+            className="h-11 flex items-center gap-2 rounded-full bg-[#1B1B1B] px-5 text-[16px] font-semibold text-white hover:bg-[#333] transition-colors">
+            <GoogleIcon className="size-5" /> Google Calendar
+          </button>
         </div>
-      </Field>
-      <Field label="RSVP deadline">
-        <input type="date" className={`${INPUT} max-w-[220px]`} />
-      </Field>
-      <Field label="Default language for guest communications">
-        <select className={`${INPUT} max-w-[280px]`}>
-          <option>English</option>
-          <option>Portuguese</option>
-          <option>Spanish</option>
-          <option>French</option>
-          <option>Italian</option>
-        </select>
-      </Field>
-      <Field label="Notification channels">
-        <div className="flex flex-col gap-2 mt-1">
-          {[
-            { label: 'Email', sub: 'RSVP confirmations and reminders by email' },
-            { label: 'WhatsApp', sub: 'Updates and reminders via WhatsApp' },
-          ].map(({ label, sub }) => (
-            <label key={label} className="flex cursor-pointer items-center justify-between rounded-xl border border-[#1B1B1B]/10 bg-[#FAFAFA] px-4 py-3 hover:bg-white transition-colors">
-              <div>
-                <p className="text-[14px] font-medium text-[#1B1B1B]">{label}</p>
-                <p className="text-[13px] text-[#1B1B1B]/45">{sub}</p>
-              </div>
-              <input type="checkbox" defaultChecked className="size-5 cursor-pointer accent-aroos-accent" />
-            </label>
-          ))}
+      )}
+
+      {calendarAnswer === 'skip' && <UserReply label="Skip for now" />}
+      {calendarAnswer === 'connect' && (
+        <UserReply label={`Connect ${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'}`} />
+      )}
+      {isPhase('cal_typing') && <TypingIndicator />}
+
+      {/* WhatsApp question */}
+      {show('wa_intro') && (
+        <MaryBubble>
+          {calendarAnswer === 'connect'
+            ? `${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'} connected! Deliverables and due dates will sync automatically. ✅`
+            : "No worries - you can connect a calendar later in Settings."}
+        </MaryBubble>
+      )}
+      {show('wa_intro') && (
+        <MaryBubble>
+          Now, want me to send you a confirmation message on WhatsApp? Once you reply there, I'll keep you posted on anything important for your event.
+        </MaryBubble>
+      )}
+      {isPhase('wa_intro') && (
+        <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
+          <button type="button" onClick={() => setPhase('wa_sent')}
+            className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
+            Skip for now
+          </button>
+          <button type="button" onClick={connectWhatsApp}
+            className="h-11 flex items-center gap-2 rounded-full bg-[#25D366] px-5 text-[16px] font-semibold text-white hover:opacity-90 transition-opacity">
+            <WhatsAppIcon className="size-5" /> Connect WhatsApp
+          </button>
         </div>
-      </Field>
+      )}
+
+      {waConnecting && <UserReply label="Connect WhatsApp" />}
+      {isPhase('wa_sending') && <TypingIndicator />}
+
+      {show('wa_sent') && waConnected && (
+        <MaryBubble>
+          Message sent! Check your WhatsApp to confirm, and from then on I'll keep you updated there. 📱
+        </MaryBubble>
+      )}
+      {show('wa_sent') && !waConnected && (
+        <MaryBubble>That's fine - you can connect WhatsApp any time in Settings.</MaryBubble>
+      )}
+      {show('wa_sent') && (
+        <MaryBubble>You're all set up. Let's finish creating your event. 🎉</MaryBubble>
+      )}
+
+      <div ref={bottomRef} />
     </div>
   )
 }
@@ -682,7 +727,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
         <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
           {step === 0 && <StepBasics />}
           {step === 1 && <StepIdentity userName={userName} {...tzProps} />}
-          {step === 2 && <StepBudgetComms />}
+          {step === 2 && <StepComms userName={userName} />}
         </div>
 
         {/* Footer */}

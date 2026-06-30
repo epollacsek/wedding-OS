@@ -182,9 +182,7 @@ type Phase =
   | 'intro' | 'intro2' | 'intro_typing' | 'q1'
   | 'q1_yes' | 'q1_no'
   | 'q1_confirmed' | 'q1_typing' | 'q2'
-  | 'q2_yes' | 'q2_no'
-  | 'q2_confirmed' | 'q2_typing' | 'q3'
-  | 'q3_answered'
+  | 'q2_answered'
 
 function ConfirmButton({ onClick }: { onClick: () => void }) {
   return (
@@ -216,7 +214,6 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
-  const [venue, setVenue] = useState('')
   const [guests, setGuests] = useState('')
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
@@ -234,12 +231,6 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
     setPhase('q1_confirmed')
     after(700, 'q1_typing')
     after(1600, 'q2')
-  }
-
-  function confirmVenue() {
-    setPhase('q2_confirmed')
-    after(700, 'q2_typing')
-    after(1600, 'q3')
   }
 
   const order: Phase[] = [
@@ -419,50 +410,23 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
         } />
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
+
+      {/* Q2 — Guest count */}
       {show('q2') && (
         <MaryBubble>
-          {date?.from ? 'Got it! Now, do you have a venue in mind?' : 'No worries - you can set the date in Settings any time. Do you have a venue in mind?'}
+          {date?.from ? 'Got it! Last one - roughly how many guests are you expecting?' : 'No worries - you can set the date in Settings any time. Last one, how many guests are you expecting?'}
         </MaryBubble>
       )}
 
-      {/* Q2 — Venue */}
-      {isPhase('q2') && (
-        <YesNo
-          onYes={() => setPhase('q2_yes')}
-          onNo={() => { setPhase('q2_no'); after(700, 'q2_typing'); after(1600, 'q3') }}
-        />
-      )}
-
-      {show('q2_yes') && !show('q2_confirmed') && (
-        <>
-          <UserReply label="Yes, we have a venue!" />
-          <MaryBubble>Lovely, what's it called or where is it?</MaryBubble>
-          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <input type="text" value={venue} onChange={e => setVenue(e.target.value)} placeholder="e.g. Palácio de Queluz, Sintra" className={INPUT} />
-          </div>
-          {venue && <ConfirmButton onClick={confirmVenue} />}
-        </>
-      )}
-
-      {show('q2_no') && !show('q2_yes') && <UserReply label="Not yet" />}
-      {show('q2_confirmed') && venue && !show('q2_yes') && <UserReply label={`The venue is ${venue}`} />}
-      {isPhase('q2_typing') && <TypingIndicator />}
-
-      {show('q3') && !show('q2_yes') && (
-        <MaryBubble>
-          {venue ? 'Perfect, noted! Last one, roughly how many guests are you expecting?' : "That's fine - we'll add the venue later. Last one, roughly how many guests are you expecting?"}
-        </MaryBubble>
-      )}
-
-      {show('q3') && !show('q2_yes') && (
+      {show('q2') && !show('q2_answered') && (
         <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <input type="number" min={0} value={guests} onChange={e => setGuests(e.target.value)}
             placeholder="e.g. 180" className={`${INPUT} max-w-[220px]`} />
-          {guests && <ConfirmButton onClick={() => setPhase('q3_answered')} />}
+          {guests && <ConfirmButton onClick={() => setPhase('q2_answered')} />}
         </div>
       )}
 
-      {show('q3_answered') && (
+      {show('q2_answered') && (
         <>
           <UserReply label={`Around ${guests} guests`} />
           <MaryBubble>All set! You're ready to move on to the next step. 🎉</MaryBubble>

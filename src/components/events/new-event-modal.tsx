@@ -414,14 +414,14 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       {show('q1_confirmed') && phase !== 'q1_yes' && date?.from && (
         <UserReply label={
           date.to && date.to.getTime() !== date.from.getTime()
-            ? `${date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} → ${date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
-            : date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+            ? `Dates confirmed for ${date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} - ${date.to.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+            : `Dates confirmed for ${date.from.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
         } />
       )}
       {isPhase('q1_typing') && <TypingIndicator />}
-      {show('q2') && (phase === 'q1_typing' || show('q2')) && !show('q1_yes') && (
+      {show('q2') && (
         <MaryBubble>
-          {date?.from ? 'Got it, noted! Now, do you have a venue in mind?' : 'No worries at all - you can set the date in Settings any time. Now, do you have a venue in mind?'}
+          {date?.from ? 'Got it! Now, do you have a venue in mind?' : 'No worries - you can set the date in Settings any time. Do you have a venue in mind?'}
         </MaryBubble>
       )}
 

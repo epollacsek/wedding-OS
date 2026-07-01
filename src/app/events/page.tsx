@@ -1,46 +1,22 @@
-import Link from 'next/link'
 import { Users, Calendar, ChevronDown } from 'lucide-react'
 import { getProfile } from '@/features/auth/queries'
+import { createServerClient } from '@/lib/supabase/server'
 import { selectEvent } from '@/features/events/actions'
 import { NewEventButton } from '@/components/events/new-event-button'
 
-type MockEvent = {
+type Event = {
   id: string
   name: string
-  type: 'Wedding' | 'Corporate' | 'Birthday' | 'Other'
-  date: string | null
-  guestCount: number
-  coverGradient: string
-  accentColor: string
+  type: string
+  ceremony_date: string | null
+  created_at: string
 }
 
-// Mock data — replaced by real DB query once events migration is live
-const MOCK_EVENTS: MockEvent[] = [
-  {
-    id: 'evt_1',
-    name: "Eduardo & Ana's Wedding",
-    type: 'Wedding',
-    date: '2027-06-12',
-    guestCount: 180,
-    coverGradient: 'linear-gradient(135deg, #CBBDEA 0%, #9B87D9 50%, #7C67C8 100%)',
-    accentColor: '#5938B7',
-  },
-  {
-    id: 'evt_2',
-    name: 'Aroos Company Retreat',
-    type: 'Corporate',
-    date: '2026-09-20',
-    guestCount: 40,
-    coverGradient: 'linear-gradient(135deg, #A9C2C8 0%, #7BA8B2 50%, #4A8A97 100%)',
-    accentColor: '#0E4A83',
-  },
-]
-
-const TYPE_LABEL: Record<MockEvent['type'], string> = {
-  Wedding: 'Wedding',
-  Corporate: 'Corporate event',
-  Birthday: 'Birthday',
-  Other: 'Event',
+const TYPE_GRADIENTS: Record<string, { gradient: string; accent: string; label: string }> = {
+  wedding:   { gradient: 'linear-gradient(135deg, #CBBDEA 0%, #9B87D9 50%, #7C67C8 100%)', accent: '#5938B7', label: 'Wedding' },
+  corporate: { gradient: 'linear-gradient(135deg, #A9C2C8 0%, #7BA8B2 50%, #4A8A97 100%)', accent: '#0E4A83', label: 'Corporate event' },
+  birthday:  { gradient: 'linear-gradient(135deg, #FFD6A5 0%, #FFC07A 50%, #F5A03E 100%)', accent: '#C47A2A', label: 'Birthday' },
+  social:    { gradient: 'linear-gradient(135deg, #B5EAD7 0%, #7ED9B5 50%, #4AC49A 100%)', accent: '#1A7A55', label: 'Social' },
 }
 
 function formatDate(iso: string) {
@@ -55,23 +31,17 @@ function daysUntil(iso: string) {
   return `${diff} days away`
 }
 
-function eventInitials(name: string): { letters: string; compact: boolean } {
-  // Detect "Person1 & Person2's ..." pattern
+function eventInitials(name: string) {
   const match = name.match(/^(\S+)\s*&\s*(\S+)/)
-  if (match) {
-    return { letters: `${match[1][0]}&${match[2][0]}`, compact: true }
-  }
-  // Fallback: first two words' initials
-  const words = name.split(' ').filter(w => w.length > 1)
-  return { letters: words.slice(0, 2).map(w => w[0]).join(''), compact: false }
+  if (match) return `${match[1][0]}&${match[2][0]}`
+  return name.split(' ').filter(w => w.length > 1).slice(0, 2).map(w => w[0]).join('')
 }
 
-// Grid columns based on event count — fills the screen naturally
 function gridClass(count: number) {
   if (count === 1) return 'grid-cols-1 max-w-lg'
   if (count === 2) return 'grid-cols-2'
   if (count === 3) return 'grid-cols-3'
-  return 'grid-cols-2'  // 4+ wraps into 2-col rows
+  return 'grid-cols-2'
 }
 
 function initials(name: string) {
@@ -79,8 +49,17 @@ function initials(name: string) {
 }
 
 export default async function EventsPage() {
-  const profile = await getProfile()
-  const total = MOCK_EVENTS.length
+  const supabase = await createServerClient()
+  const [profile, { data: events }] = await Promise.all([
+    getProfile(),
+    supabase.from('events').select('id, name, type, ceremony_date, created_at').order('created_at', { ascending: false }),
+  ])
+
+  const list: Event[] = events ?? []
+  const total = list.length
+  const role = profile?.persona_type
+    ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1)
+    : 'Host'
 
   return (
     <main className="flex min-h-screen flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
@@ -100,82 +79,62 @@ export default async function EventsPage() {
       </header>
 
       <section className="flex flex-1 flex-col px-8 pt-4 pb-10">
-        <h1 className="text-[38px] font-bold leading-tight tracking-tight text-[#1B1B1B]">
-          Your events
-        </h1>
+        <h1 className="text-[38px] font-bold leading-tight tracking-tight text-[#1B1B1B]">Your events</h1>
         <p className="mt-1 text-[17px] text-[#1B1B1B]/50">
-          Pick an event to continue, or create a new one.
+          {total === 0 ? 'No events yet. Create your first one below.' : 'Pick an event to continue, or create a new one.'}
         </p>
 
-        {/* Event cards — evenly split across full width, grow to fill space */}
-        <div className={`mt-10 grid gap-5 flex-1 ${gridClass(total)}`}>
-          {MOCK_EVENTS.map(event => {
-            const days = event.date ? daysUntil(event.date) : null
-            const role = profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'
-            return (
-              <form key={event.id} action={selectEvent.bind(null, event.name, role)} className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer"
-              >
-                <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
-                {/* Cover */}
-                <div
-                  className="relative w-full flex-1"
-                  style={{ background: event.coverGradient }}
-                >
-                  <div className="absolute left-4 top-4">
-                    <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm">
-                      {TYPE_LABEL[event.type]}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[40%]">
-                    {(() => {
-                      const { letters, compact } = eventInitials(event.name)
-                      return (
-                        <div className="size-[100px] rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center font-bold text-[#1B1B1B]">
-                          <span className="text-[26px] tracking-tight">
-                            {letters}
-                          </span>
-                        </div>
-                      )
-                    })()}
-                  </div>
-                </div>
+        {total > 0 && (
+          <div className={`mt-10 grid gap-5 flex-1 ${gridClass(total)}`}>
+            {list.map(event => {
+              const style = TYPE_GRADIENTS[event.type] ?? TYPE_GRADIENTS.social
+              const days = event.ceremony_date ? daysUntil(event.ceremony_date) : null
 
-                {/* Content */}
-                <div className="flex flex-col px-6 pb-6 pt-12 text-center">
-                  <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
-                    {event.name}
-                  </h2>
-                  {event.date && (
-                    <p className="mt-1.5 text-[14px] text-[#1B1B1B]/50">
-                      {formatDate(event.date)}
-                    </p>
-                  )}
-                  {days && (
-                    <span
-                      className="mx-auto mt-3 rounded-full px-3 py-1 text-[13px] font-semibold text-white"
-                      style={{ backgroundColor: event.accentColor }}
-                    >
-                      {days}
-                    </span>
-                  )}
-                  <div className="mt-5 flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
-                    <span className="flex items-center gap-1.5">
-                      <Users className="size-4" />
-                      {event.guestCount} guests
-                    </span>
-                    {event.date && (
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="size-4" />
-                        {new Date(event.date).getFullYear()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                </button>
-              </form>
-            )
-          })}
-        </div>
+              return (
+                <form key={event.id} action={selectEvent.bind(null, event.name, role)}
+                  className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer">
+                  <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
+                    <div className="relative w-full flex-1" style={{ background: style.gradient }}>
+                      <div className="absolute left-4 top-4">
+                        <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm">
+                          {style.label}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[40%]">
+                        <div className="size-[100px] rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center font-bold text-[#1B1B1B]">
+                          <span className="text-[26px] tracking-tight">{eventInitials(event.name)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col px-6 pb-6 pt-12 text-center">
+                      <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
+                        {event.name}
+                      </h2>
+                      {event.ceremony_date && (
+                        <p className="mt-1.5 text-[14px] text-[#1B1B1B]/50">{formatDate(event.ceremony_date)}</p>
+                      )}
+                      {days && (
+                        <span className="mx-auto mt-3 rounded-full px-3 py-1 text-[13px] font-semibold text-white"
+                          style={{ backgroundColor: style.accent }}>
+                          {days}
+                        </span>
+                      )}
+                      <div className="mt-5 flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
+                        {event.ceremony_date && (
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="size-4" />
+                            {new Date(event.ceremony_date).getFullYear()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                </form>
+              )
+            })}
+          </div>
+        )}
 
         <NewEventButton userName={profile?.full_name?.split(' ')[0] ?? 'there'} />
       </section>

@@ -85,14 +85,14 @@ export default async function EventsPage() {
         </p>
 
         {total > 0 && (
-          <div className={`mt-10 grid gap-5 flex-1 ${gridClass(total)}`}>
+          <div className={`mt-10 grid gap-5 ${gridClass(total)}`}>
             {list.map(event => {
               const style = TYPE_GRADIENTS[event.type] ?? TYPE_GRADIENTS.social
               const days = event.ceremony_date ? daysUntil(event.ceremony_date) : null
 
               return (
                 <form key={event.id} action={selectEvent.bind(null, event.name, role)}
-                  className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer">
+                  className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer h-[62vh]">
                   <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
                     <div className="relative w-full flex-1" style={{ background: style.gradient }}>
                       <div className="absolute left-4 top-4">
@@ -107,7 +107,7 @@ export default async function EventsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col px-6 pb-5 pt-12 text-center shrink-0 h-[150px]">
+                    <div className="flex flex-col px-6 pb-6 pt-12 text-center shrink-0">
                       <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
                         {event.name}
                       </h2>

@@ -108,7 +108,7 @@ export function TopNav({ collapsed = false, profile, activeEvent }: { collapsed?
 
         <a
           href={activeEvent ? undefined : '/events'}
-          className="h-[52px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
+          className="h-[52px] w-[320px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover"
         >
           <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
             {profile ? initials(profile.full_name) : 'EP'}

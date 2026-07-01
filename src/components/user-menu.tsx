@@ -53,7 +53,7 @@ export function UserMenuButton({ fullName, email, role, initials }: Props) {
 
           {/* Menu items */}
           <div className="p-2">
-            <a href="/settings"
+            <a href="/profile"
               className="flex items-center gap-3 rounded-xl px-4 py-3 text-[18px] text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.05] transition-colors"
               onClick={() => setOpen(false)}
             >

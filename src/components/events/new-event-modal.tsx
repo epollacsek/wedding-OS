@@ -287,7 +287,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
       <style>{`@keyframes maryBounce { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-6px);opacity:1} }`}</style>
 
       {/* Intro */}
-      {show('intro') && <MaryBubble>Hi{firstName}! 👋 I'm Mary, your personal event organizer.</MaryBubble>}
+      {show('intro') && <MaryBubble>Hi{firstName}! I'm Mary, your personal event organizer.</MaryBubble>}
       {show('intro2') && <MaryBubble>I'll ask you a few quick questions to get your event set up. It'll only take a minute.</MaryBubble>}
       {phase === 'intro_typing' && <TypingIndicator />}
 
@@ -583,7 +583,7 @@ function StepComms({ userName, onDone }: { userName: string; onDone: () => void 
       {/* WhatsApp intro */}
       {show('wa_intro') && emailAnswer === 'connect' && (
         <MaryBubble>
-          {emailProvider === 'gmail' ? 'Gmail' : 'Outlook'} connected! I'll handle invitations and updates from there. ✅
+          {emailProvider === 'gmail' ? 'Gmail' : 'Outlook'} connected! I'll handle invitations and updates from there.
         </MaryBubble>
       )}
       {show('wa_intro') && emailAnswer === 'skip' && (
@@ -611,7 +611,7 @@ function StepComms({ userName, onDone }: { userName: string; onDone: () => void 
       {isPhase('wa_sending') && <TypingIndicator />}
       {waAnswer === 'connect' && !isPhase('wa_sending') && show('wa_sent') && (
         <MaryBubble>
-          Sent! Check your WhatsApp to confirm. Once you reply, I'll be pinging you there for everything important. 📱
+          Sent! Check your WhatsApp to confirm. Once you reply, I'll be pinging you there for everything important.
         </MaryBubble>
       )}
 
@@ -622,7 +622,7 @@ function StepComms({ userName, onDone }: { userName: string; onDone: () => void 
       )}
 
       {show('done') && (
-        <MaryBubble>You're all set up. Let's finish creating your event. 🎉</MaryBubble>
+        <MaryBubble>You're all set up. Let's finish creating your event.</MaryBubble>
       )}
 
       <div ref={bottomRef} />

@@ -5,6 +5,7 @@ import { ChevronRight, ChevronLeft, Check, Heart, Briefcase, Gift, Users, X } fr
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
 import { getAllTimezones, searchTimezones, type TzEntry } from '@/lib/timezones'
+import { createEvent } from '@/features/events/actions'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -93,19 +94,22 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   )
 }
 
-function StepBasics() {
-  const [selected, setSelected] = useState<string | null>(null)
-
+function StepBasics({ eventType, setEventType, eventName, setEventName }: {
+  eventType: string | null
+  setEventType: (v: string) => void
+  eventName: string
+  setEventName: (v: string) => void
+}) {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-4 gap-4 p-2 -m-2">
         {EVENT_TYPES.map(({ value, icon: Icon, label, sub, accent, iconColor }) => {
-          const active = selected === value
+          const active = eventType === value
           return (
             <button
               key={value}
               type="button"
-              onClick={() => setSelected(value)}
+              onClick={() => setEventType(value)}
               style={active ? { backgroundColor: accent, borderColor: iconColor } : {}}
               className={`relative flex flex-col items-start gap-4 rounded-2xl p-5 text-left transition-all duration-200 ${
                 active
@@ -133,13 +137,15 @@ function StepBasics() {
         })}
       </div>
 
-      {selected && (
+      {eventType && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
           <Field label="How should we call your event?">
             <input
               type="text"
               autoFocus
-              placeholder={selected === 'Wedding' ? "Eduardo & Ana's Wedding" : selected === 'Corporate' ? 'Aroos Company Retreat' : selected === 'Birthday' ? "Ana's 30th" : 'Summer Dinner Party'}
+              value={eventName}
+              onChange={e => setEventName(e.target.value)}
+              placeholder={eventType === 'Wedding' ? "Eduardo & Ana's Wedding" : eventType === 'Corporate' ? 'Aroos Company Retreat' : eventType === 'Birthday' ? "Ana's 30th" : 'Summer Dinner Party'}
               className={INPUT}
             />
           </Field>
@@ -633,11 +639,14 @@ function StepComms({ userName, onDone }: { userName: string; onDone: () => void 
 export function NewEventModal({ open, onClose, userName = 'there' }: { open: boolean; onClose: () => void; userName?: string }) {
   const [step, setStep] = useState(0)
   const isLast = step === STEPS.length - 1
+  const [eventType, setEventType] = useState<string | null>(null)
+  const [eventName, setEventName] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
   // Tracks whether each conversational step has been fully completed.
-  // Step 0 (event type picker) is always unlocked since it's a form, not a flow.
   const [step1Done, setStep1Done] = useState(false)
   const [step2Done, setStep2Done] = useState(false)
-  const canNext = step === 0 || (step === 1 && step1Done) || (step === 2 && step2Done)
+  const canNext = (step === 0 && !!eventType && !!eventName.trim()) || (step === 1 && step1Done) || (step === 2 && step2Done)
 
   // Timezone state lives here so popup can escape overflow:hidden
   const allTz = getAllTimezones()
@@ -679,11 +688,26 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
 
   function handleClose() {
     setStep(0)
+    setEventType(null)
+    setEventName('')
     setStep1Done(false)
     setStep2Done(false)
+    setCreateError(null)
     setTzPopupVisible(false)
     setTzConfirmed(false)
     onClose()
+  }
+
+  async function handleCreate() {
+    if (!eventType || !eventName.trim()) return
+    setCreating(true)
+    setCreateError(null)
+    const result = await createEvent({ name: eventName.trim(), type: eventType })
+    if (result?.error) {
+      setCreateError(result.error)
+      setCreating(false)
+    }
+    // On success, createEvent redirects to /home — no need to close manually
   }
 
   return (
@@ -746,7 +770,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
 
         {/* Body */}
         <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
-          {step === 0 && <StepBasics />}
+          {step === 0 && <StepBasics eventType={eventType} setEventType={setEventType} eventName={eventName} setEventName={setEventName} />}
           {step === 1 && <StepIdentity userName={userName} {...tzProps} onDone={() => setStep1Done(true)} />}
           {step === 2 && <StepComms userName={userName} onDone={() => setStep2Done(true)} />}
         </div>
@@ -762,15 +786,18 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
             {step === 0 ? 'Cancel' : 'Back'}
           </button>
 
-          <button
-            type="button"
-            onClick={() => isLast ? handleClose() : setStep(s => s + 1)}
-            disabled={!canNext}
-            className="flex items-center gap-1.5 h-10 rounded-full bg-aroos-accent px-6 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            {isLast ? 'Create event' : 'Next'}
-            {!isLast && <ChevronRight className="size-4" />}
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            {createError && <p className="text-[13px] text-red-500">{createError}</p>}
+            <button
+              type="button"
+              onClick={() => isLast ? handleCreate() : setStep(s => s + 1)}
+              disabled={!canNext || creating}
+              className="flex items-center gap-1.5 h-10 rounded-full bg-aroos-accent px-6 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {isLast ? (creating ? 'Creating...' : 'Create event') : 'Next'}
+              {!isLast && <ChevronRight className="size-4" />}
+            </button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,8 +1,9 @@
-import { Users, Calendar, ChevronDown } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import { getProfile } from '@/features/auth/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { selectEvent } from '@/features/events/actions'
 import { NewEventButton } from '@/components/events/new-event-button'
+import { UserMenuButton } from '@/components/user-menu'
 
 type Event = {
   id: string
@@ -60,8 +61,9 @@ function initials(name: string) {
 
 export default async function EventsPage() {
   const supabase = await createServerClient()
-  const [profile, { data: events }] = await Promise.all([
+  const [profile, { data: { user } }, { data: events }] = await Promise.all([
     getProfile(),
+    supabase.auth.getUser(),
     supabase.from('events').select('id, name, type, ceremony_date, created_at').order('created_at', { ascending: false }),
   ])
 
@@ -77,15 +79,12 @@ export default async function EventsPage() {
         <span className="text-[28px] font-bold leading-none tracking-tight text-[#1B1B1B]">
           aroos.
         </span>
-        <button className="h-[52px] min-w-[350px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover">
-          <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
-            {profile ? initials(profile.full_name) : 'EP'}
-          </div>
-          <div className="min-w-0 flex-1 text-left leading-tight px-1">
-            <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{profile?.full_name ?? 'Eduardo Pollacsek'}</p>
-          </div>
-          <ChevronDown className="size-6 shrink-0 text-[#1B1B1B]/70" />
-        </button>
+        <UserMenuButton
+          fullName={profile?.full_name ?? 'Eduardo Pollacsek'}
+          email={user?.email ?? ''}
+          role={profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'}
+          initials={profile ? initials(profile.full_name) : 'EP'}
+        />
       </header>
 
       <section className="flex flex-1 flex-col px-8 pt-4 pb-10">

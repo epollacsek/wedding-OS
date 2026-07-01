@@ -40,7 +40,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 const STEPS = [
   { label: 'What are we planning?', sub: 'Pick a category to get started' },
   { label: 'Meet Mary', sub: 'Your AI event organizer - she\'ll guide you through the setup' },
-  { label: 'Stay connected', sub: 'Sync your calendar and WhatsApp so nothing slips through' },
+  { label: 'Stay connected', sub: 'Connect your email and WhatsApp so nothing slips through' },
 ]
 
 const EVENT_TYPES = [
@@ -479,49 +479,54 @@ function StepTeam() {
 }
 
 type CommsPhase =
-  | 'intro' | 'intro2' | 'cal_q'
-  | 'cal_typing' | 'wa_intro'
-  | 'wa_sending' | 'wa_sent'
+  | 'intro' | 'intro2' | 'email_q'
+  | 'email_typing' | 'wa_intro' | 'wa_typing'
+  | 'wa_sending' | 'wa_sent' | 'done'
 
 function StepComms({ userName }: { userName: string }) {
   const [phase, setPhase] = useState<CommsPhase>('intro')
-  const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null)
-  const [calendarAnswer, setCalendarAnswer] = useState<'skip' | 'connect' | null>(null)
-  const [waConnecting, setWaConnecting] = useState(false)
-  const [waConnected, setWaConnected] = useState(false)
+  const [emailProvider, setEmailProvider] = useState<'gmail' | 'outlook' | null>(null)
+  const [emailAnswer, setEmailAnswer] = useState<'skip' | 'connect' | null>(null)
+  const [waAnswer, setWaAnswer] = useState<'skip' | 'connect' | null>(null)
 
   const firstName = userName === 'there' ? '' : `, ${userName}`
 
   useEffect(() => {
     if (phase === 'intro') setTimeout(() => setPhase('intro2'), 900)
-    if (phase === 'intro2') setTimeout(() => setPhase('cal_q'), 1400)
+    if (phase === 'intro2') setTimeout(() => setPhase('email_q'), 1400)
   }, [phase])
 
   function after(ms: number, fn: () => void) { setTimeout(fn, ms) }
 
-  // TODO: swap this simulated connect for real OAuth once Google/Microsoft
-  // apps are registered in Google Cloud Console / Azure Portal.
-  function connectCalendar(provider: 'google' | 'outlook') {
-    setCalendarProvider(provider)
-    setCalendarAnswer('connect')
-    setPhase('cal_typing')
-    after(1300, () => setPhase('wa_intro'))
+  // TODO: swap for real Gmail / Outlook OAuth once credentials are registered.
+  function connectEmail(provider: 'gmail' | 'outlook') {
+    setEmailProvider(provider)
+    setEmailAnswer('connect')
+    setPhase('email_typing')
+    after(1200, () => setPhase('wa_intro'))
   }
 
-  function skipCalendar() {
-    setCalendarAnswer('skip')
-    setPhase('cal_typing')
+  function skipEmail() {
+    setEmailAnswer('skip')
+    setPhase('email_typing')
     after(900, () => setPhase('wa_intro'))
   }
 
   // TODO: swap for real WhatsApp Business API opt-in once available.
   function connectWhatsApp() {
-    setWaConnecting(true)
+    setWaAnswer('connect')
     setPhase('wa_sending')
-    after(1500, () => { setWaConnected(true); setPhase('wa_sent') })
+    after(1500, () => setPhase('wa_sent'))
+    after(2400, () => setPhase('done'))
   }
 
-  const order: CommsPhase[] = ['intro', 'intro2', 'cal_q', 'cal_typing', 'wa_intro', 'wa_sending', 'wa_sent']
+  function skipWhatsApp() {
+    setWaAnswer('skip')
+    setPhase('wa_typing')
+    after(800, () => setPhase('done'))
+  }
+
+  const order: CommsPhase[] = ['intro','intro2','email_q','email_typing','wa_intro','wa_typing','wa_sending','wa_sent','done']
   const show = (p: CommsPhase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: CommsPhase[]) => ps.includes(phase)
 
@@ -537,56 +542,57 @@ function StepComms({ userName }: { userName: string }) {
       {/* Storytelling intro */}
       {show('intro') && (
         <MaryBubble>
-          One last thing{firstName} - a couple of small connections that make a big difference in how smooth this gets.
+          Almost there{firstName}! Two quick things that'll make running this event a lot smoother.
         </MaryBubble>
       )}
       {show('intro2') && (
         <MaryBubble>
-          If we sync your calendar, deliverables and due dates show up automatically. And with WhatsApp connected, I can ping you directly about RSVPs and anything that needs your attention - much faster than digging through email.
+          First, your email. If I have access, I can send invitations, RSVP updates and reminders directly on your behalf - saving you from doing it all manually.
         </MaryBubble>
       )}
 
-      {/* Calendar question */}
-      {show('cal_q') && <MaryBubble>Want to connect a calendar?</MaryBubble>}
-      {isPhase('cal_q') && (
+      {/* Email question */}
+      {show('email_q') && <MaryBubble>Want to connect your email?</MaryBubble>}
+      {isPhase('email_q') && (
         <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
-          <button type="button" onClick={skipCalendar}
+          <button type="button" onClick={skipEmail}
             className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
             Skip for now
           </button>
-          <button type="button" onClick={() => connectCalendar('outlook')}
+          <button type="button" onClick={() => connectEmail('outlook')}
             className="h-11 flex items-center gap-2 rounded-full border border-[#1B1B1B]/15 bg-white px-5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
             <OutlookIcon className="size-5" /> Outlook
           </button>
-          <button type="button" onClick={() => connectCalendar('google')}
+          <button type="button" onClick={() => connectEmail('gmail')}
             className="h-11 flex items-center gap-2 rounded-full bg-[#1B1B1B] px-5 text-[16px] font-semibold text-white hover:bg-[#333] transition-colors">
-            <GoogleIcon className="size-5" /> Google Calendar
+            <GoogleIcon className="size-5" /> Gmail
           </button>
         </div>
       )}
 
-      {calendarAnswer === 'skip' && <UserReply label="Skip for now" />}
-      {calendarAnswer === 'connect' && (
-        <UserReply label={`Connect ${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'}`} />
+      {emailAnswer === 'skip' && <UserReply label="Skip for now" />}
+      {emailAnswer === 'connect' && (
+        <UserReply label={`Connect ${emailProvider === 'gmail' ? 'Gmail' : 'Outlook'}`} />
       )}
-      {isPhase('cal_typing') && <TypingIndicator />}
+      {isPhase('email_typing') && <TypingIndicator />}
 
-      {/* WhatsApp question */}
-      {show('wa_intro') && (
+      {/* WhatsApp intro */}
+      {show('wa_intro') && emailAnswer === 'connect' && (
         <MaryBubble>
-          {calendarAnswer === 'connect'
-            ? `${calendarProvider === 'google' ? 'Google Calendar' : 'Outlook'} connected! Deliverables and due dates will sync automatically. ✅`
-            : "No worries - you can connect a calendar later in Settings."}
+          {emailProvider === 'gmail' ? 'Gmail' : 'Outlook'} connected! I'll handle invitations and updates from there. ✅
         </MaryBubble>
       )}
+      {show('wa_intro') && emailAnswer === 'skip' && (
+        <MaryBubble>No worries - you can connect your email in Settings whenever you're ready.</MaryBubble>
+      )}
       {show('wa_intro') && (
         <MaryBubble>
-          Now, want me to send you a confirmation message on WhatsApp? Once you reply there, I'll keep you posted on anything important for your event.
+          Now for WhatsApp. This is where I shine - I'll ping you directly about RSVPs, deadlines and anything that needs a quick decision. Much faster than checking email.
         </MaryBubble>
       )}
       {isPhase('wa_intro') && (
         <div className="flex justify-end gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pl-12">
-          <button type="button" onClick={() => setPhase('wa_sent')}
+          <button type="button" onClick={skipWhatsApp}
             className="h-11 rounded-full border border-[#1B1B1B]/15 bg-white px-6 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-all">
             Skip for now
           </button>
@@ -597,18 +603,21 @@ function StepComms({ userName }: { userName: string }) {
         </div>
       )}
 
-      {waConnecting && <UserReply label="Connect WhatsApp" />}
+      {waAnswer === 'connect' && <UserReply label="Connect WhatsApp" />}
       {isPhase('wa_sending') && <TypingIndicator />}
-
-      {show('wa_sent') && waConnected && (
+      {waAnswer === 'connect' && !isPhase('wa_sending') && show('wa_sent') && (
         <MaryBubble>
-          Message sent! Check your WhatsApp to confirm, and from then on I'll keep you updated there. 📱
+          Sent! Check your WhatsApp to confirm. Once you reply, I'll be pinging you there for everything important. 📱
         </MaryBubble>
       )}
-      {show('wa_sent') && !waConnected && (
-        <MaryBubble>That's fine - you can connect WhatsApp any time in Settings.</MaryBubble>
+
+      {waAnswer === 'skip' && <UserReply label="Skip for now" />}
+      {isPhase('wa_typing') && <TypingIndicator />}
+      {waAnswer === 'skip' && show('done') && (
+        <MaryBubble>No problem - you can connect WhatsApp any time in Settings.</MaryBubble>
       )}
-      {show('wa_sent') && (
+
+      {show('done') && (
         <MaryBubble>You're all set up. Let's finish creating your event. 🎉</MaryBubble>
       )}
 

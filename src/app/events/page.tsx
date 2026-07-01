@@ -94,7 +94,7 @@ export default async function EventsPage() {
                 <form key={event.id} action={selectEvent.bind(null, event.name, role)}
                   className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer">
                   <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
-                    <div className="relative w-full flex-1 min-h-[260px]" style={{ background: style.gradient }}>
+                    <div className="relative w-full h-[340px]" style={{ background: style.gradient }}>
                       <div className="absolute left-4 top-4">
                         <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm">
                           {style.label}
@@ -116,19 +116,18 @@ export default async function EventsPage() {
                       ) : (
                         <p className="mt-1.5 text-[14px] text-[#1B1B1B]/35 italic">No date set yet</p>
                       )}
-                      {days && (
-                        <span className="mx-auto mt-3 rounded-full px-3 py-1 text-[13px] font-semibold text-white"
-                          style={{ backgroundColor: style.accent }}>
-                          {days}
-                        </span>
-                      )}
                       <div className="mt-5 flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
-                        {event.ceremony_date && (
+                        {days ? (
+                          <span className="rounded-full px-3 py-1 text-[13px] font-semibold text-white"
+                            style={{ backgroundColor: style.accent }}>
+                            {days}
+                          </span>
+                        ) : event.ceremony_date ? (
                           <span className="flex items-center gap-1.5">
                             <Calendar className="size-4" />
                             {new Date(event.ceremony_date).getFullYear()}
                           </span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </button>

@@ -54,7 +54,7 @@ export default async function ProfilePage() {
     <div className="min-h-screen flex flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
 
       {/* Same header as events page */}
-      <header className="flex h-[84px] shrink-0 items-center justify-between px-6 bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
+      <header className="flex h-[84px] shrink-0 items-center justify-between px-6">
         <span className="text-[28px] font-bold leading-none tracking-tight text-[#1B1B1B]">aroos.</span>
         <UserMenuButton
           fullName={profile.full_name}
@@ -64,8 +64,8 @@ export default async function ProfilePage() {
         />
       </header>
 
-      {/* Full-width white content area */}
-      <div className="flex-1 bg-white">
+      {/* White panel on top of gradient, fills remaining screen */}
+      <div className="flex-1 bg-white rounded-tl-[24px] shadow-[-6px_0_24px_-6px_rgba(27,27,27,0.1)]">
         <div className="px-10 py-8 border-b border-[#1B1B1B]/06">
           <h1 className="text-[30px] font-bold text-[#1B1B1B]">Profile settings</h1>
 

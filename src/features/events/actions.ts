@@ -32,13 +32,5 @@ export async function createEvent(data: {
 
   if (error) return { error: error.message }
 
-  // Set the new event as active
-  const jar = await cookies()
-  jar.set('active_event', JSON.stringify({ name: data.name, role: 'Host' }), {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-  })
-
-  redirect('/home')
+  redirect('/events')
 }

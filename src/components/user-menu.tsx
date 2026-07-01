@@ -34,7 +34,7 @@ export function UserMenuButton({ fullName, email, role, initials }: Props) {
           {initials}
         </div>
         <div className="min-w-0 flex-1 text-left leading-tight px-1">
-          <p className="truncate text-[15px] font-medium leading-tight text-[#1B1B1B]">{fullName}</p>
+          <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{fullName}</p>
         </div>
         <ChevronDown className={`size-5 shrink-0 text-[#1B1B1B]/60 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>

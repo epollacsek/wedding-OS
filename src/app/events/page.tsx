@@ -38,9 +38,10 @@ function eventInitials(name: string) {
 }
 
 function gridClass(count: number) {
-  if (count <= 2) return 'grid-cols-2'
+  if (count === 1) return 'grid-cols-1'
+  if (count === 2) return 'grid-cols-2'
   if (count === 3) return 'grid-cols-3'
-  return 'grid-cols-2'
+  return 'grid-cols-4'
 }
 
 function initials(name: string) {
@@ -110,8 +111,10 @@ export default async function EventsPage() {
                       <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
                         {event.name}
                       </h2>
-                      {event.ceremony_date && (
+                      {event.ceremony_date ? (
                         <p className="mt-1.5 text-[14px] text-[#1B1B1B]/50">{formatDate(event.ceremony_date)}</p>
+                      ) : (
+                        <p className="mt-1.5 text-[14px] text-[#1B1B1B]/35 italic">No date set yet</p>
                       )}
                       {days && (
                         <span className="mx-auto mt-3 rounded-full px-3 py-1 text-[13px] font-semibold text-white"

@@ -237,9 +237,10 @@ type StepIdentityProps = {
   setTzSearch: (v: string) => void
   onCalendarOpen: () => void
   pillRef: React.RefObject<HTMLButtonElement>
+  onDone: () => void
 }
 
-function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen, pillRef }: StepIdentityProps) {
+function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen, pillRef, onDone }: StepIdentityProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
   const [startMinutes, setStartMinutes] = useState(600)
@@ -257,6 +258,7 @@ function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzC
     if (phase === 'intro2') setTimeout(() => setPhase('intro_typing'), 1400)
     if (phase === 'intro_typing') setTimeout(() => setPhase('q1'), 1000)
     if (phase === 'q1_yes') onCalendarOpen()
+    if (phase === 'done') onDone()
   }, [phase])
 
   function after(ms: number, next: Phase) { setTimeout(() => setPhase(next), ms) }
@@ -483,7 +485,7 @@ type CommsPhase =
   | 'email_typing' | 'wa_intro' | 'wa_typing'
   | 'wa_sending' | 'wa_sent' | 'done'
 
-function StepComms({ userName }: { userName: string }) {
+function StepComms({ userName, onDone }: { userName: string; onDone: () => void }) {
   const [phase, setPhase] = useState<CommsPhase>('intro')
   const [emailProvider, setEmailProvider] = useState<'gmail' | 'outlook' | null>(null)
   const [emailAnswer, setEmailAnswer] = useState<'skip' | 'connect' | null>(null)
@@ -529,6 +531,8 @@ function StepComms({ userName }: { userName: string }) {
   const order: CommsPhase[] = ['intro','intro2','email_q','email_typing','wa_intro','wa_typing','wa_sending','wa_sent','done']
   const show = (p: CommsPhase) => order.indexOf(phase) >= order.indexOf(p)
   const isPhase = (...ps: CommsPhase[]) => ps.includes(phase)
+
+  useEffect(() => { if (phase === 'done') onDone() }, [phase])
 
   const bottomRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -629,6 +633,11 @@ function StepComms({ userName }: { userName: string }) {
 export function NewEventModal({ open, onClose, userName = 'there' }: { open: boolean; onClose: () => void; userName?: string }) {
   const [step, setStep] = useState(0)
   const isLast = step === STEPS.length - 1
+  // Tracks whether each conversational step has been fully completed.
+  // Step 0 (event type picker) is always unlocked since it's a form, not a flow.
+  const [step1Done, setStep1Done] = useState(false)
+  const [step2Done, setStep2Done] = useState(false)
+  const canNext = step === 0 || (step === 1 && step1Done) || (step === 2 && step2Done)
 
   // Timezone state lives here so popup can escape overflow:hidden
   const allTz = getAllTimezones()
@@ -664,11 +673,14 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const tzProps = {
     selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed,
     tzOpen, setTzOpen, tzSearch, setTzSearch, pillRef,
-    onCalendarOpen: measureAndShow
+    onCalendarOpen: measureAndShow,
+    onDone: () => setStep1Done(true)
   }
 
   function handleClose() {
     setStep(0)
+    setStep1Done(false)
+    setStep2Done(false)
     setTzPopupVisible(false)
     setTzConfirmed(false)
     onClose()
@@ -735,8 +747,8 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
         {/* Body */}
         <div className="px-8 pb-6 max-h-[55vh] overflow-y-auto">
           {step === 0 && <StepBasics />}
-          {step === 1 && <StepIdentity userName={userName} {...tzProps} />}
-          {step === 2 && <StepComms userName={userName} />}
+          {step === 1 && <StepIdentity userName={userName} {...tzProps} onDone={() => setStep1Done(true)} />}
+          {step === 2 && <StepComms userName={userName} onDone={() => setStep2Done(true)} />}
         </div>
 
         {/* Footer */}
@@ -753,7 +765,8 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
           <button
             type="button"
             onClick={() => isLast ? handleClose() : setStep(s => s + 1)}
-            className="flex items-center gap-1.5 h-10 rounded-full bg-aroos-accent px-6 text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+            disabled={!canNext}
+            className="flex items-center gap-1.5 h-10 rounded-full bg-aroos-accent px-6 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {isLast ? 'Create event' : 'Next'}
             {!isLast && <ChevronRight className="size-4" />}

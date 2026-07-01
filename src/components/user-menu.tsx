@@ -40,7 +40,7 @@ export function UserMenuButton({ fullName, email, role, initials }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-[300px] rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_12px_40px_rgba(27,27,27,0.16)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 top-full mt-2 z-50 w-[390px] rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_12px_40px_rgba(27,27,27,0.16)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
 
           {/* Header */}
           <div className="px-5 py-4 border-b border-[#1B1B1B]/06">

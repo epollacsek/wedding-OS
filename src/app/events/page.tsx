@@ -32,9 +32,19 @@ function daysUntil(iso: string) {
 }
 
 function eventInitials(name: string) {
+  // Couple pattern: "Person & Person"
   const match = name.match(/^(\S+)\s*&\s*(\S+)/)
   if (match) return `${match[1][0]}&${match[2][0]}`
-  return name.split(' ').filter(w => w.length > 1).slice(0, 2).map(w => w[0]).join('')
+  const words = name.trim().split(/\s+/)
+  // Single short word: show up to 3 chars of the word itself
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase()
+  // Multi-word: take initial of long words, full token if ≤2 chars (e.g. numbers)
+  let result = ''
+  for (const w of words) {
+    if (result.length >= 3) break
+    result += w.length <= 2 ? w : w[0]
+  }
+  return result.toUpperCase().slice(0, 3)
 }
 
 function gridClass(count: number) {
@@ -95,7 +105,7 @@ export default async function EventsPage() {
                   className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_2px_16px_rgba(27,27,27,0.08)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(27,27,27,0.16)] hover:-translate-y-1 cursor-pointer h-[62vh]">
                   <button type="submit" className="flex flex-col flex-1 w-full text-left min-h-0">
                     <div className="relative w-full flex-1" style={{ background: style.gradient }}>
-                      <div className="absolute left-4 top-4">
+                      <div className="absolute right-4 top-4">
                         <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm">
                           {style.label}
                         </span>

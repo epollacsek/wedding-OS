@@ -244,11 +244,18 @@ type StepIdentityProps = {
   onCalendarOpen: () => void
   pillRef: React.RefObject<HTMLButtonElement>
   onDone: () => void
+  eventDate: Date | undefined
+  setEventDate: (d: Date | undefined) => void
 }
 
-function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen, pillRef, onDone }: StepIdentityProps) {
+function StepIdentity({ userName, selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed, tzOpen, setTzOpen, tzSearch, setTzSearch, onCalendarOpen, pillRef, onDone, eventDate, setEventDate }: StepIdentityProps) {
   const [phase, setPhase] = useState<Phase>('intro')
-  const [date, setDate] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
+  // date is a range for the calendar UI; eventDate (lifted) holds the ceremony start date
+  const [date, setDateLocal] = useState<{ from?: Date; to?: Date } | undefined>(undefined)
+  function setDate(val: { from?: Date; to?: Date } | undefined) {
+    setDateLocal(val)
+    setEventDate(val?.from)
+  }
   const [startMinutes, setStartMinutes] = useState(600)
   const [endMinutes, setEndMinutes] = useState(1320)
   // Explicit branch tracking — q1 forks into mutually exclusive yes/no paths,
@@ -641,6 +648,7 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
   const isLast = step === STEPS.length - 1
   const [eventType, setEventType] = useState<string | null>(null)
   const [eventName, setEventName] = useState('')
+  const [eventDate, setEventDate] = useState<Date | undefined>(undefined)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   // Tracks whether each conversational step has been fully completed.
@@ -683,13 +691,15 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
     selectedTz, setSelectedTz, tzConfirmed, setTzConfirmed,
     tzOpen, setTzOpen, tzSearch, setTzSearch, pillRef,
     onCalendarOpen: measureAndShow,
-    onDone: () => setStep1Done(true)
+    onDone: () => setStep1Done(true),
+    eventDate, setEventDate,
   }
 
   function handleClose() {
     setStep(0)
     setEventType(null)
     setEventName('')
+    setEventDate(undefined)
     setStep1Done(false)
     setStep2Done(false)
     setCreateError(null)
@@ -702,7 +712,11 @@ export function NewEventModal({ open, onClose, userName = 'there' }: { open: boo
     if (!eventType || !eventName.trim()) return
     setCreating(true)
     setCreateError(null)
-    const result = await createEvent({ name: eventName.trim(), type: eventType })
+    const result = await createEvent({
+      name: eventName.trim(),
+      type: eventType,
+      ceremonyDate: eventDate?.toISOString().split('T')[0],
+    })
     if (result?.error) {
       setCreateError(result.error)
       setCreating(false)

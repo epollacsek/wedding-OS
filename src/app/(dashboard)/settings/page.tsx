@@ -3,17 +3,17 @@ import Link from 'next/link'
 export default function SettingsPage() {
   return (
     <div className="px-8 pt-6 pb-16 max-w-[780px]">
-      <nav className="flex items-center gap-2 text-sm font-normal text-[#1B1B1B]/55" aria-label="Breadcrumb">
+      <nav className="flex items-center gap-2 text-[14px] font-normal text-[#1B1B1B]/55" aria-label="Breadcrumb">
         <Link href="/home" className="transition-colors hover:text-[#1B1B1B]">Home</Link>
         <span aria-hidden="true">/</span>
         <span className="text-[#1B1B1B]/70" aria-current="page">Event Settings</span>
       </nav>
       <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Event Settings</h1>
-      <p className="mt-3 text-[17px] text-[#1B1B1B]/50">Configure everything about this event before you start planning.</p>
+      <p className="mt-3 text-[15px] text-[#1B1B1B]/50">Configure everything about this event before you start planning.</p>
 
       {/* ── Event Basics ── */}
       <section className="mt-10">
-        <h2 className="text-[22px] font-semibold text-[#1B1B1B]">Event basics</h2>
+        <h2 className="text-[18px] font-semibold text-[#1B1B1B]">Event basics</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">The core details that define this event.</p>
 
         <div className="mt-6 flex flex-col gap-5">
@@ -60,7 +60,7 @@ export default function SettingsPage() {
 
       {/* ── Identity ── */}
       <section>
-        <h2 className="text-[22px] font-semibold text-[#1B1B1B]">Identity</h2>
+        <h2 className="text-[18px] font-semibold text-[#1B1B1B]">Identity</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">How this event looks across the platform and on your wedding website.</p>
 
         <div className="mt-6 flex flex-col gap-5">
@@ -98,7 +98,7 @@ export default function SettingsPage() {
 
       {/* ── Your Team ── */}
       <section>
-        <h2 className="text-[22px] font-semibold text-[#1B1B1B]">Your team</h2>
+        <h2 className="text-[18px] font-semibold text-[#1B1B1B]">Your team</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">People who help you manage this event.</p>
 
         <div className="mt-6 flex flex-col gap-4">
@@ -122,7 +122,7 @@ export default function SettingsPage() {
 
       {/* ── Budget ── */}
       <section>
-        <h2 className="text-[22px] font-semibold text-[#1B1B1B]">Budget</h2>
+        <h2 className="text-[18px] font-semibold text-[#1B1B1B]">Budget</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">Sets the baseline for the Finance module.</p>
 
         <div className="mt-6 grid grid-cols-2 gap-5">
@@ -144,7 +144,7 @@ export default function SettingsPage() {
 
       {/* ── Communications ── */}
       <section>
-        <h2 className="text-[22px] font-semibold text-[#1B1B1B]">Communications</h2>
+        <h2 className="text-[18px] font-semibold text-[#1B1B1B]">Communications</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">How and when you communicate with guests.</p>
 
         <div className="mt-6 flex flex-col gap-5">
@@ -193,7 +193,7 @@ export default function SettingsPage() {
 
       {/* ── Danger Zone ── */}
       <section>
-        <h2 className="text-[22px] font-semibold text-red-600">Danger zone</h2>
+        <h2 className="text-[18px] font-semibold text-red-600">Danger zone</h2>
         <p className="mt-1 text-[15px] text-[#1B1B1B]/50">These actions are irreversible. Please be certain.</p>
 
         <div className="mt-6 flex flex-col gap-3">

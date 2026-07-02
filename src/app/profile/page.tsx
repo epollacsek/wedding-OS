@@ -50,7 +50,15 @@ export default async function ProfilePage() {
   const lastName = nameParts.slice(1).join(' ') || null
   const role = ROLE_LABEL[profile.persona_type] ?? profile.persona_type
 
-  const hasPending = !profile.birth_date || !profile.nationality || !profile.address
+  const pendingFields = [
+    !profile.birth_date  && 'Date of birth',
+    !profile.nationality && 'Nationality',
+    !profile.address     && 'Street address',
+    !profile.city        && 'City',
+    !profile.country     && 'Country',
+  ].filter(Boolean) as string[]
+
+  const hasPending = pendingFields.length > 0
 
   return (
     <div className="min-h-screen flex flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
@@ -70,8 +78,10 @@ export default async function ProfilePage() {
             </div>
             {hasPending && (
               <div className="mt-4 min-w-[480px] rounded-xl bg-red-50 border border-red-200 px-5 py-4">
-                <p className="text-[22px] font-semibold text-red-700">Profile incomplete</p>
-                <p className="text-[19px] text-red-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
+                <p className="text-[19px] font-semibold text-red-700">Profile incomplete</p>
+                <p className="text-[16px] text-red-600 mt-0.5">
+                  Missing: {pendingFields.join(', ')}.
+                </p>
               </div>
             )}
           </div>

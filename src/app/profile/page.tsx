@@ -2,6 +2,7 @@ import { Pencil } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { UserMenuButton } from '@/components/user-menu'
+import { BackButton } from '@/components/back-button'
 
 function profileInitials(name: string) {
   return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -68,11 +69,7 @@ export default async function ProfilePage() {
       {/* White panel on top of gradient, fills remaining screen */}
       <div className="flex-1 bg-white rounded-tl-[24px] shadow-[-6px_0_24px_-6px_rgba(27,27,27,0.1)]">
         <div className="px-8 pt-6 pb-0 border-b border-[#1B1B1B]/06">
-          <nav className="flex items-center gap-2 text-sm font-normal text-[#1B1B1B]/55">
-            <span>Account</span>
-            <span>/</span>
-            <span className="text-[#1B1B1B]/70">Profile settings</span>
-          </nav>
+          <BackButton />
           <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
 
           {/* Tabs */}

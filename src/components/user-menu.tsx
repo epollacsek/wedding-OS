@@ -29,7 +29,7 @@ export function UserMenuButton({ fullName, email, role, initials, subtitle }: Pr
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className="h-[52px] w-[288px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover shrink-0"
+        className="h-[52px] w-[310px] flex items-center gap-3 rounded-full bg-aroos-chrome py-1 pl-1 pr-4 text-[#1B1B1B] transition-colors hover:bg-aroos-chrome-hover shrink-0"
       >
         <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
           {initials}

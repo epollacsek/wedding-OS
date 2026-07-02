@@ -67,20 +67,25 @@ export default async function ProfilePage() {
 
       {/* White panel on top of gradient, fills remaining screen */}
       <div className="flex-1 bg-white rounded-tl-[24px] shadow-[-6px_0_24px_-6px_rgba(27,27,27,0.1)]">
-        <div className="px-10 py-8 border-b border-[#1B1B1B]/06">
-          <h1 className="text-[30px] font-bold text-[#1B1B1B]">Profile settings</h1>
+        <div className="px-8 pt-6 pb-0 border-b border-[#1B1B1B]/06">
+          <nav className="flex items-center gap-2 text-sm font-normal text-[#1B1B1B]/55">
+            <span>Account</span>
+            <span>/</span>
+            <span className="text-[#1B1B1B]/70">Profile settings</span>
+          </nav>
+          <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
 
           {/* Tabs */}
-          <div className="flex gap-8 mt-5">
-            <button className="pb-3 text-[15px] font-semibold text-[#1B1B1B] border-b-2 border-[#1B1B1B]">Personal</button>
-            <button className="pb-3 text-[15px] text-[#1B1B1B]/45 hover:text-[#1B1B1B] transition-colors">Account access</button>
+          <div className="flex gap-8 mt-6">
+            <button className="pb-4 text-[15px] font-semibold text-[#1B1B1B] border-b-2 border-[#1B1B1B]">Personal</button>
+            <button className="pb-4 text-[15px] text-[#1B1B1B]/45 hover:text-[#1B1B1B] transition-colors">Account access</button>
           </div>
         </div>
 
-        <div className="grid grid-cols-[1fr_380px] min-h-[calc(100vh-84px-97px)]">
+        <div className="grid grid-cols-[1fr_380px] min-h-[calc(100vh-84px-130px)]">
 
           {/* Left — Personal data */}
-          <div className="px-10 py-8 border-r border-[#1B1B1B]/06">
+          <div className="px-8 py-8 border-r border-[#1B1B1B]/06">
 
             {hasPending && (
               <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
@@ -111,7 +116,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Right — Photo + account */}
-          <div className="px-8 py-8 bg-[#FAFAFA] flex flex-col gap-8">
+          <div className="px-8 py-8 bg-[#FAFAFA] flex flex-col gap-8 border-l border-[#1B1B1B]/06">
 
             {/* Profile photo */}
             <div>

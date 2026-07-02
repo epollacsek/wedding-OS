@@ -27,6 +27,13 @@ function Row({ label, value, pending }: { label: string; value?: string | null; 
   )
 }
 
+const ROLE_LABEL: Record<string, string> = {
+  host: 'Host', organizer: 'Organizer',
+  planner: 'Wedding Planner', vendor: 'Vendor', worker: 'Worker',
+}
+
+const LANGUAGES = ['English', 'Portuguese', 'Spanish', 'French', 'Italian', 'German']
+
 export default async function ProfilePage() {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -34,7 +41,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, persona_type, full_name, whatsapp, cpf, birth_date, nationality, created_at')
+    .select('id, persona_type, full_name, whatsapp, birth_date, nationality, address, city, postcode, country, preferred_language, created_at')
     .eq('id', user.id)
     .single()
 
@@ -43,30 +50,20 @@ export default async function ProfilePage() {
   const nameParts = profile.full_name.trim().split(' ')
   const firstName = nameParts[0]
   const lastName = nameParts.slice(1).join(' ') || null
+  const role = ROLE_LABEL[profile.persona_type] ?? profile.persona_type
 
-  const roleLabel: Record<string, string> = {
-    host: 'Host', organizer: 'Organizer',
-    planner: 'Wedding Planner', vendor: 'Vendor', worker: 'Worker',
-  }
-  const role = roleLabel[profile.persona_type] ?? profile.persona_type
-  const hasPending = !profile.birth_date || !profile.nationality || !profile.cpf
+  const hasPending = !profile.birth_date || !profile.nationality || !profile.address
 
   return (
     <div className="min-h-screen flex flex-col bg-[linear-gradient(var(--aroos-bg-from)_0%,var(--aroos-bg-to)_100%)]">
 
       <header className="flex h-[84px] shrink-0 items-center justify-between px-6">
         <span className="text-[28px] font-bold leading-none tracking-tight text-[#1B1B1B]">aroos.</span>
-        <UserMenuButton
-          fullName={profile.full_name}
-          email={user.email ?? ''}
-          role={role}
-          initials={profileInitials(profile.full_name)}
-          subtitle="Profile settings"
-        />
+        <UserMenuButton fullName={profile.full_name} email={user.email ?? ''} role={role}
+          initials={profileInitials(profile.full_name)} subtitle="Profile settings" />
       </header>
 
       <div className="flex-1 bg-white rounded-tl-[24px] shadow-[-6px_0_24px_-6px_rgba(27,27,27,0.1)] overflow-auto">
-        {/* Page header */}
         <div className="px-8 pt-6 pb-0 border-b border-[#1B1B1B]/06">
           <BackButton />
           <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
@@ -76,25 +73,24 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="grid grid-cols-[7fr_3fr] min-h-[calc(100vh-84px-130px)]">
 
-          {/* Left */}
+          {/* Left — Personal data */}
           <div className="px-8 py-12 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
 
             {hasPending && (
               <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
                 <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
-                <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to get the most out of Aroos.</p>
+                <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
               </div>
             )}
 
-            {/* Personal data card */}
+            {/* Personal data */}
             <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
               <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
                 <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Personal data</h2>
                 <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
-                  <Pencil className="size-3" /> Edit
+                  <Pencil className="size-3.5" /> Edit
                 </button>
               </div>
               <div className="px-6">
@@ -105,18 +101,46 @@ export default async function ProfilePage() {
                 <Row label="Nationality" value={profile.nationality} pending={!profile.nationality} />
                 <Row label="Phone / WhatsApp" value={profile.whatsapp} />
                 <Row label="Email" value={user.email} />
-                <Row label="CPF / Tax ID" value={profile.cpf} pending={!profile.cpf} />
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
+                <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Address</h2>
+                <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
+                  <Pencil className="size-3.5" /> Edit
+                </button>
+              </div>
+              <div className="px-6">
+                <Row label="Street address" value={profile.address} pending={!profile.address} />
+                <Row label="City" value={profile.city} pending={!profile.city} />
+                <Row label="Postcode" value={profile.postcode} />
+                <Row label="Country" value={profile.country} pending={!profile.country} />
+              </div>
+            </div>
+
+            {/* Communication */}
+            <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
+                <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Communication preferences</h2>
+                <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
+                  <Pencil className="size-3.5" /> Edit
+                </button>
+              </div>
+              <div className="px-6">
+                <Row label="Preferred language" value={profile.preferred_language ?? 'English'} />
               </div>
             </div>
           </div>
 
-          {/* Right */}
-          <div className="px-8 py-8 flex flex-col gap-6">
+          {/* Right — Photo + account */}
+          <div className="px-6 py-8 flex flex-col gap-6">
 
-            {/* Profile photo card */}
+            {/* Profile photo */}
             <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white p-6">
               <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Profile photo</h2>
-              <p className="text-[16px] text-[#1B1B1B]/45 mt-1 mb-6">Your photo is visible to guests and collaborators on your events.</p>
+              <p className="text-[16px] text-[#1B1B1B]/45 mt-1 mb-6">Visible to guests and collaborators.</p>
               <div className="flex flex-col items-center">
                 <div className="size-[96px] rounded-full bg-aroos-avatar flex items-center justify-center text-[28px] font-bold text-[#1B1B1B]">
                   {profileInitials(profile.full_name)}
@@ -127,13 +151,13 @@ export default async function ProfilePage() {
               </div>
             </div>
 
-            {/* Account card */}
+            {/* Account */}
             <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
               <div className="px-6 py-4 border-b border-[#1B1B1B]/06">
                 <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Your Aroos account</h2>
               </div>
               <div className="px-6">
-                <Row label="Account type" value={role} />
+                <Row label="Role" value={role} />
                 <Row label="Member since" value={formatDate(profile.created_at)} />
               </div>
             </div>

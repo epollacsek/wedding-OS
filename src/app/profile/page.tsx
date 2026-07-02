@@ -73,17 +73,20 @@ export default async function ProfilePage() {
           </div>
         </div>
 
+        {/* Banner — full width, aligned with page title */}
+        {hasPending && (
+          <div className="px-8 pt-8">
+            <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
+              <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
+              <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-[7fr_3fr] min-h-[calc(100vh-84px-130px)]">
 
           {/* Left — Personal data */}
-          <div className="px-8 py-12 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
-
-            {hasPending && (
-              <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
-                <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
-                <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
-              </div>
-            )}
+          <div className="px-8 py-8 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
 
             {/* Personal data */}
             <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">

@@ -109,7 +109,7 @@ function NationalityEditRow({ label, value, onChange }: {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => { setOpen(false); setSearch('') }} />
-          <div className="absolute left-56 top-full mt-1 z-50 w-72 overflow-hidden rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.16)]">
+          <div className="absolute left-56 bottom-full mb-1 z-50 w-72 overflow-hidden rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.16)]">
             <div className="flex items-center gap-2.5 border-b border-[#1B1B1B]/06 px-4 py-3">
               <Search className="size-[15px] shrink-0 text-[#1B1B1B]/35" />
               <input
@@ -200,7 +200,7 @@ function PhoneEditRow({ label, country, localDigits, onCountryChange, onDigitsCh
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => { setOpen(false); setSearch('') }} />
-          <div className="absolute left-56 top-full mt-1 z-50 w-72 overflow-hidden rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.16)]">
+          <div className="absolute left-56 bottom-full mb-1 z-50 w-72 overflow-hidden rounded-2xl border border-[#1B1B1B]/08 bg-white shadow-[0_16px_48px_rgba(27,27,27,0.16)]">
             <div className="flex items-center gap-2.5 border-b border-[#1B1B1B]/06 px-4 py-3">
               <Search className="size-[15px] shrink-0 text-[#1B1B1B]/35" />
               <input

@@ -117,8 +117,8 @@ export default async function EventsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col px-6 pb-6 pt-12 text-center shrink-0">
-                      <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent">
+                    <div className="flex flex-col px-6 pb-6 pt-12 text-center shrink-0 h-[200px]">
+                      <h2 className="text-[20px] font-semibold leading-snug text-[#1B1B1B] transition-colors group-hover:text-aroos-accent line-clamp-2">
                         {event.name}
                       </h2>
                       {event.ceremony_date ? (
@@ -126,7 +126,7 @@ export default async function EventsPage() {
                       ) : (
                         <p className="mt-1.5 text-[14px] text-[#1B1B1B]/35 italic">No date set yet</p>
                       )}
-                      <div className="mt-5 flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
+                      <div className="mt-auto flex items-center justify-center gap-4 border-t border-[#1B1B1B]/06 pt-4 text-[14px] text-[#1B1B1B]/50">
                         {days ? (
                           <span className="rounded-full px-3 py-1 text-[13px] font-semibold text-white"
                             style={{ backgroundColor: style.accent }}>
@@ -137,7 +137,9 @@ export default async function EventsPage() {
                             <Calendar className="size-4" />
                             {new Date(event.ceremony_date).getFullYear()}
                           </span>
-                        ) : null}
+                        ) : (
+                          <span className="h-6" />
+                        )}
                       </div>
                     </div>
                   </button>

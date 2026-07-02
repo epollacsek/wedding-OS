@@ -65,23 +65,23 @@ export default async function ProfilePage() {
 
       <div className="flex-1 bg-white rounded-tl-[24px] shadow-[-6px_0_24px_-6px_rgba(27,27,27,0.1)] overflow-auto">
         <div className="px-8 pt-6 pb-0 border-b border-[#1B1B1B]/06">
-          <BackButton />
-          <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
+          <div className="flex items-start justify-between">
+            <div>
+              <BackButton />
+              <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
+            </div>
+            {hasPending && (
+              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-5 py-3 max-w-[380px]">
+                <p className="text-[16px] font-semibold text-amber-700">Profile incomplete</p>
+                <p className="text-[14px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
+              </div>
+            )}
+          </div>
           <div className="flex gap-8 mt-[42px]">
             <button className="pb-4 text-[19px] font-semibold text-[#1B1B1B] border-b-2 border-[#1B1B1B]">Personal</button>
             <button className="pb-4 text-[19px] text-[#1B1B1B]/40 hover:text-[#1B1B1B] transition-colors">Account access</button>
           </div>
         </div>
-
-        {/* Banner — full width, aligned with page title */}
-        {hasPending && (
-          <div className="px-8 pt-8">
-            <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
-              <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
-              <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
-            </div>
-          </div>
-        )}
 
         <div className="grid grid-cols-[7fr_3fr] min-h-[calc(100vh-84px-130px)]">
 

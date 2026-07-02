@@ -71,9 +71,9 @@ export default async function ProfilePage() {
               <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
             </div>
             {hasPending && (
-              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-5 py-3 max-w-[380px]">
-                <p className="text-[16px] font-semibold text-amber-700">Profile incomplete</p>
-                <p className="text-[14px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
+              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
+                <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
+                <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
               </div>
             )}
           </div>

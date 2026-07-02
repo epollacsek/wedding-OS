@@ -77,10 +77,10 @@ export default async function ProfilePage() {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-2 min-h-[calc(100vh-84px-130px)]">
+        <div className="grid grid-cols-[3fr_2fr] min-h-[calc(100vh-84px-130px)]">
 
           {/* Left */}
-          <div className="px-8 py-8 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
+          <div className="px-8 py-12 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
 
             {hasPending && (
               <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">

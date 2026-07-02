@@ -70,14 +70,14 @@ export default async function ProfilePage() {
         <div className="px-8 pt-6 pb-0 border-b border-[#1B1B1B]/06">
           <BackButton />
           <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
-          <div className="flex gap-8 mt-[29px]">
+          <div className="flex gap-8 mt-[36px]">
             <button className="pb-4 text-[19px] font-semibold text-[#1B1B1B] border-b-2 border-[#1B1B1B]">Personal</button>
             <button className="pb-4 text-[19px] text-[#1B1B1B]/40 hover:text-[#1B1B1B] transition-colors">Account access</button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-[3fr_2fr] min-h-[calc(100vh-84px-130px)]">
+        <div className="grid grid-cols-[7fr_3fr] min-h-[calc(100vh-84px-130px)]">
 
           {/* Left */}
           <div className="px-8 py-12 border-r border-[#1B1B1B]/06 flex flex-col gap-6">

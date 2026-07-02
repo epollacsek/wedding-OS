@@ -1,8 +1,10 @@
-import { Pencil } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { UserMenuButton } from '@/components/user-menu'
 import { BackButton } from '@/components/back-button'
+import { PersonalDataCard } from '@/components/profile/personal-data-card'
+import { AddressCard } from '@/components/profile/address-card'
+import { CommunicationCard } from '@/components/profile/communication-card'
 
 function profileInitials(name: string) {
   return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -12,27 +14,23 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function Row({ label, value, pending }: { label: string; value?: string | null; pending?: boolean }) {
+const ROLE_LABEL: Record<string, string> = {
+  host: 'Host', organizer: 'Organizer',
+  planner: 'Wedding Planner', vendor: 'Vendor', worker: 'Worker',
+}
+
+function Row({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex items-center py-4 border-b border-[#1B1B1B]/06 last:border-0">
       <span className="text-[18px] text-[#1B1B1B]/50 w-56 shrink-0">{label}</span>
       {value ? (
         <span className="text-[18px] font-semibold text-[#1B1B1B]">{value}</span>
       ) : (
-        <span className={`text-[18px] ${pending ? 'text-amber-500 font-medium' : 'text-[#1B1B1B]/30'}`}>
-          {pending ? 'Pending' : 'Not specified'}
-        </span>
+        <span className="text-[18px] text-[#1B1B1B]/30">Not specified</span>
       )}
     </div>
   )
 }
-
-const ROLE_LABEL: Record<string, string> = {
-  host: 'Host', organizer: 'Organizer',
-  planner: 'Wedding Planner', vendor: 'Vendor', worker: 'Worker',
-}
-
-const LANGUAGES = ['English', 'Portuguese', 'Spanish', 'French', 'Italian', 'German']
 
 export default async function ProfilePage() {
   const supabase = await createServerClient()
@@ -41,7 +39,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, persona_type, full_name, whatsapp, birth_date, nationality, address, city, postcode, country, preferred_language, created_at')
+    .select('id, persona_type, full_name, preferred_name, whatsapp, birth_date, nationality, address, city, postcode, country, preferred_language, created_at')
     .eq('id', user.id)
     .single()
 
@@ -71,9 +69,9 @@ export default async function ProfilePage() {
               <h1 className="mt-4 text-[43px] font-bold leading-10 text-[#1B1B1B]">Profile settings</h1>
             </div>
             {hasPending && (
-              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-5 py-4">
-                <p className="text-[18px] font-semibold text-amber-700">Profile incomplete</p>
-                <p className="text-[16px] text-amber-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
+              <div className="mt-4 min-w-[480px] rounded-xl bg-red-50 border border-red-200 px-5 py-4">
+                <p className="text-[22px] font-semibold text-red-700">Profile incomplete</p>
+                <p className="text-[19px] text-red-600 mt-0.5">Some fields are still pending. Complete your profile to unlock all features.</p>
               </div>
             )}
           </div>
@@ -88,53 +86,26 @@ export default async function ProfilePage() {
           {/* Left — Personal data */}
           <div className="px-8 py-8 border-r border-[#1B1B1B]/06 flex flex-col gap-6">
 
-            {/* Personal data */}
-            <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
-                <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Personal data</h2>
-                <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
-                  <Pencil className="size-3.5" /> Edit
-                </button>
-              </div>
-              <div className="px-6">
-                <Row label="First name" value={firstName} />
-                <Row label="Last name" value={lastName} />
-                <Row label="Preferred name" pending />
-                <Row label="Date of birth" value={profile.birth_date ? formatDate(profile.birth_date) : null} pending={!profile.birth_date} />
-                <Row label="Nationality" value={profile.nationality} pending={!profile.nationality} />
-                <Row label="Phone / WhatsApp" value={profile.whatsapp} />
-                <Row label="Email" value={user.email} />
-              </div>
-            </div>
+            <PersonalDataCard
+              firstName={firstName}
+              lastName={lastName}
+              preferredName={profile.preferred_name ?? null}
+              birthDate={profile.birth_date ?? null}
+              nationality={profile.nationality ?? null}
+              whatsapp={profile.whatsapp}
+              email={user.email ?? ''}
+            />
 
-            {/* Address */}
-            <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
-                <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Address</h2>
-                <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
-                  <Pencil className="size-3.5" /> Edit
-                </button>
-              </div>
-              <div className="px-6">
-                <Row label="Street address" value={profile.address} pending={!profile.address} />
-                <Row label="City" value={profile.city} pending={!profile.city} />
-                <Row label="Postcode" value={profile.postcode} />
-                <Row label="Country" value={profile.country} pending={!profile.country} />
-              </div>
-            </div>
+            <AddressCard
+              address={profile.address ?? null}
+              city={profile.city ?? null}
+              postcode={profile.postcode ?? null}
+              country={profile.country ?? null}
+            />
 
-            {/* Communication */}
-            <div className="rounded-2xl border border-[#1B1B1B]/08 bg-white overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1B1B1B]/06">
-                <h2 className="text-[19px] font-semibold text-[#1B1B1B]">Communication preferences</h2>
-                <button className="flex items-center gap-1.5 rounded-lg border border-[#1B1B1B]/12 px-3 py-1.5 text-[16px] font-medium text-[#1B1B1B] hover:bg-[#1B1B1B]/[0.04] transition-colors">
-                  <Pencil className="size-3.5" /> Edit
-                </button>
-              </div>
-              <div className="px-6">
-                <Row label="Preferred language" value={profile.preferred_language ?? 'English'} />
-              </div>
-            </div>
+            <CommunicationCard
+              preferredLanguage={profile.preferred_language ?? 'English'}
+            />
           </div>
 
           {/* Right — Photo + account */}

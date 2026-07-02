@@ -84,6 +84,7 @@ export default async function EventsPage() {
           email={user?.email ?? ''}
           role={profile?.persona_type ? profile.persona_type.charAt(0).toUpperCase() + profile.persona_type.slice(1) : 'Host'}
           initials={profile ? initials(profile.full_name) : 'EP'}
+          subtitle="Select an event"
         />
       </header>
 

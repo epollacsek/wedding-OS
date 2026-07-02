@@ -61,6 +61,7 @@ export default async function ProfilePage() {
           email={user.email ?? ''}
           role={role}
           initials={profileInitials(profile.full_name)}
+          subtitle="Profile settings"
         />
       </header>
 

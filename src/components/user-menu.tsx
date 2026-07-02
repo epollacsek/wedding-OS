@@ -9,9 +9,10 @@ type Props = {
   email: string
   role: string
   initials: string
+  subtitle?: string
 }
 
-export function UserMenuButton({ fullName, email, role, initials }: Props) {
+export function UserMenuButton({ fullName, email, role, initials, subtitle }: Props) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -33,10 +34,11 @@ export function UserMenuButton({ fullName, email, role, initials }: Props) {
         <div className="size-11 rounded-full bg-aroos-avatar flex items-center justify-center text-base font-medium text-[#1B1B1B] select-none shrink-0">
           {initials}
         </div>
-        <div className="min-w-0 flex-1 text-left leading-tight px-1">
+        <div className="min-w-0 text-left leading-tight px-1">
           <p className="truncate text-xl font-medium leading-tight text-[#1B1B1B]">{fullName}</p>
+          {subtitle && <p className="truncate text-[15px] font-normal leading-tight text-[#1B1B1B]/60">{subtitle}</p>}
         </div>
-        <ChevronDown className={`size-5 shrink-0 text-[#1B1B1B]/60 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-6 shrink-0 text-[#1B1B1B]/70 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
